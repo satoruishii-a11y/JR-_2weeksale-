@@ -1,0 +1,462 @@
+{
+  "id": "editorial-15s",
+  "name": "和エディトリアル15秒（4カット）",
+  "version": "1.0.0",
+  "description": "明朝の大見出しと金の細罫線で構成する上質系の型。黒い座布団を使わず、グラデーションと余白で可読性を作る。カットごとに文字の位置と組み方を変えてリズムを出す（右上の縦書き→左上→右下→中央ロックアップ）。旅行・食・住宅など単価が高い商材向け。",
+  "fps": 30,
+  "hookType": "${axis.hook}",
+
+  "axes": {
+    "hook": {
+      "description": "冒頭3秒の切り口。何で足を止めるか",
+      "values": ["price", "scarcity", "question"]
+    },
+    "typeStyle": {
+      "description": "大見出しの組み方。縦書き明朝（和の上質）vs 横書き明朝（モダン）",
+      "values": ["tate", "yoko"]
+    },
+    "ctaTiming": {
+      "description": "CTA帯を中盤から出すか、最後だけ出すか",
+      "values": ["early", "late"]
+    }
+  },
+
+  "requiredCopy": [
+    "kicker",
+    "hook.price", "hook.scarcity", "hook.question",
+    "benefit1", "benefit2", "offer", "cta"
+  ],
+
+  "audio": { "volume": 0.16, "fadeIn": 0.8, "fadeOut": 1.6 },
+
+  "defs": {
+    "grid": {
+      "margin": 9,
+      "marginNeg": -9
+    },
+
+    "grade": {
+      "brightness": -0.02,
+      "contrast": 1.04,
+      "saturation": 0.88,
+      "blurPx": 0
+    },
+
+    "type": {
+      "headlineTate": {
+        "font": "mincho",
+        "writingMode": "vertical",
+        "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 7.4, "square": 6.8 }, "default": 6.4 } },
+        "minSizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 5.2, "square": 4.8 }, "default": 4.4 } },
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.06,
+        "lineHeight": 1.78,
+        "shadow": { "color": "rgba(12,8,6,0.5)", "blurEm": 0.3, "offsetXEm": 0, "offsetYEm": 0.04 }
+      },
+      "headlineYoko": {
+        "font": "mincho",
+        "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 7.6, "square": 6.4 }, "default": 5.4 } },
+        "minSizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 5.4, "square": 4.6 }, "default": 3.9 } },
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.04,
+        "lineHeight": 1.5,
+        "align": "left",
+        "shadow": { "color": "rgba(12,8,6,0.5)", "blurEm": 0.3, "offsetXEm": 0, "offsetYEm": 0.04 }
+      },
+      "kicker": {
+        "font": "gothicBold",
+        "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.0, "square": 2.7 }, "default": 2.5 } },
+        "color": "${brand.accent}",
+        "letterSpacingEm": 0.22,
+        "lineHeight": 1.4,
+        "align": "left",
+        "shadow": { "color": "rgba(12,8,6,0.6)", "blurEm": 0.4, "offsetXEm": 0, "offsetYEm": 0.05 }
+      },
+      "body": {
+        "font": "gothic",
+        "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 4.2, "square": 3.8 }, "default": 3.5 } },
+        "minSizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.0, "square": 2.7 }, "default": 2.5 } },
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.1,
+        "lineHeight": 1.7,
+        "align": "left",
+        "shadow": { "color": "rgba(12,8,6,0.55)", "blurEm": 0.35, "offsetXEm": 0, "offsetYEm": 0.05 }
+      },
+      "bodyRight": {
+        "font": "gothic",
+        "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 4.2, "square": 3.8 }, "default": 3.5 } },
+        "minSizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.0, "square": 2.7 }, "default": 2.5 } },
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.1,
+        "lineHeight": 1.7,
+        "align": "right",
+        "shadow": { "color": "rgba(12,8,6,0.55)", "blurEm": 0.35, "offsetXEm": 0, "offsetYEm": 0.05 }
+      },
+      "offer": {
+        "font": "minchoMid",
+        "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 5.0, "square": 4.6 }, "default": 4.2 } },
+        "minSizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.6, "square": 3.3 }, "default": 3.0 } },
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.12,
+        "lineHeight": 1.4,
+        "align": "center"
+      },
+      "cta": {
+        "font": "gothicBold",
+        "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.8, "square": 3.4 }, "default": 3.2 } },
+        "minSizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 2.7, "square": 2.4 }, "default": 2.3 } },
+        "color": "${brand.textOnPrimary}",
+        "letterSpacingEm": 0.14,
+        "lineHeight": 1.3,
+        "align": "center"
+      }
+    },
+
+    "rule": {
+      "horizontal": {
+        "kind": "band",
+        "color": "${brand.accent}",
+        "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 4.5 }, "default": 7 } },
+        "heightPct": { "$switch": { "on": "orientation", "cases": { "landscape": 0.38 }, "default": 0.24 } },
+        "radiusPct": 0,
+        "anim": "slide-right",
+        "animDuration": 0.42,
+        "outDuration": 0
+      },
+      "vertical": {
+        "kind": "band",
+        "color": "${brand.accent}",
+        "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 0.22 }, "default": 0.36 } },
+        "heightPct": { "$switch": { "on": "orientation", "cases": { "landscape": 9 }, "default": 6.5 } },
+        "radiusPct": 0,
+        "anim": "slide-up",
+        "animDuration": 0.42,
+        "outDuration": 0
+      }
+    },
+
+    "y": {
+      "contentBottom": { "$switch": { "on": "orientation", "cases": { "landscape": -22, "square": -26 }, "default": -30 } },
+      "tateTop": { "$switch": { "on": "orientation", "cases": { "landscape": 13, "square": 12 }, "default": 12 } },
+      "topBlock": { "$switch": { "on": "orientation", "cases": { "landscape": 17, "square": 16 }, "default": 15 } },
+      "ctaBar": { "$switch": { "on": "orientation", "cases": { "landscape": -10, "square": -13 }, "default": -17 } }
+    },
+
+    "width": {
+      "text": { "$switch": { "on": "orientation", "cases": { "landscape": 58, "square": 74 }, "default": 82 } },
+      "bar": { "$switch": { "on": "orientation", "cases": { "landscape": 52, "square": 74 }, "default": 82 } }
+    },
+
+    "scrimBottom": {
+      "kind": "scrim",
+      "side": "bottom",
+      "heightPct": 52,
+      "color": "#120E0B",
+      "strength": 0.74,
+      "anim": "none",
+      "start": 0
+    },
+    "scrimTop": {
+      "kind": "scrim",
+      "side": "top",
+      "heightPct": 42,
+      "color": "#120E0B",
+      "strength": 0.62,
+      "anim": "none",
+      "start": 0
+    }
+  },
+
+  "scenes": [
+    {
+      "id": "hook",
+      "asset": "hero1",
+      "duration": 4.2,
+      "motion": "zoom-in",
+      "motionIntensity": 0.75,
+      "grade": { "$ref": "defs.grade" },
+      "overlays": [
+        { "$ref": "defs.scrimBottom" },
+        {
+          "$ref": "defs.scrimTop",
+          "heightPct": 34,
+          "strength": { "$switch": { "on": "axis:typeStyle", "cases": { "tate": 0.5 }, "default": 0.3 } }
+        },
+
+        {
+          "$switch": {
+            "on": "axis:typeStyle",
+            "cases": {
+              "tate": {
+                "kind": "text",
+                "role": "headline",
+                "id": "headline",
+                "text": "${copy.hook.${axis.hook}}",
+                "style": { "$ref": "defs.type.headlineTate" },
+                "maxHeightPct": { "$switch": { "on": "orientation", "cases": { "landscape": 66 }, "default": 54 } },
+                "maxWidthPct": 60,
+                "maxLines": 2,
+                "anchor": "top-right",
+                "xPct": { "$ref": "defs.grid.marginNeg" },
+                "yPct": { "$ref": "defs.y.tateTop" },
+                "start": 0.34,
+                "anim": "slide-down",
+                "animDuration": 0.44,
+                "outDuration": 0.3
+              },
+              "yoko": {
+                "kind": "text",
+                "role": "headline",
+                "id": "headline",
+                "text": "${copy.hook.${axis.hook}}",
+                "style": { "$ref": "defs.type.headlineYoko" },
+                "maxWidthPct": { "$ref": "defs.width.text" },
+                "maxLines": 3,
+                "anchor": "bottom-left",
+                "xPct": { "$ref": "defs.grid.margin" },
+                "yPct": { "$ref": "defs.y.contentBottom" },
+                "start": 0.34,
+                "anim": "slide-up",
+                "animDuration": 0.4,
+                "outDuration": 0.3
+              }
+            }
+          }
+        },
+
+        {
+          "$switch": {
+            "on": "axis:typeStyle",
+            "cases": {
+              "tate": {
+                "$ref": "defs.rule.horizontal",
+                "anchor": "bottom-left",
+                "xPct": { "$ref": "defs.grid.margin" },
+                "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -32 }, "default": -40 } },
+                "start": 0.18
+              },
+              "yoko": {
+                "$ref": "defs.rule.horizontal",
+                "anchor": "top-left",
+                "xPct": { "$ref": "defs.grid.margin" },
+                "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": 14 }, "default": 12 } },
+                "start": 0.18
+              }
+            }
+          }
+        },
+        {
+          "$switch": {
+            "on": "axis:typeStyle",
+            "cases": {
+              "tate": {
+                "kind": "text",
+                "role": "sub",
+                "id": "kicker",
+                "text": "${copy.kicker}",
+                "style": { "$ref": "defs.type.kicker" },
+                "maxWidthPct": { "$ref": "defs.width.text" },
+                "maxLines": 1,
+                "anchor": "bottom-left",
+                "xPct": { "$ref": "defs.grid.margin" },
+                "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -24 }, "default": -33 } },
+                "start": 0.26,
+                "anim": "slide-up",
+                "animDuration": 0.36
+              },
+              "yoko": {
+                "kind": "text",
+                "role": "sub",
+                "id": "kicker",
+                "text": "${copy.kicker}",
+                "style": { "$ref": "defs.type.kicker" },
+                "maxWidthPct": { "$ref": "defs.width.text" },
+                "maxLines": 1,
+                "anchor": "top-left",
+                "xPct": { "$ref": "defs.grid.margin" },
+                "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": 17 }, "default": 14.5 } },
+                "start": 0.26,
+                "anim": "slide-up",
+                "animDuration": 0.36
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "benefit1",
+      "asset": "hero2",
+      "duration": 3.6,
+      "motion": "pan-right",
+      "motionIntensity": 0.55,
+      "transitionIn": "fade",
+      "transitionDuration": 0.45,
+      "grade": { "$ref": "defs.grade" },
+      "overlays": [
+        { "$ref": "defs.scrimTop" },
+        {
+          "$ref": "defs.rule.vertical",
+          "anchor": "top-left",
+          "xPct": { "$ref": "defs.grid.margin" },
+          "yPct": { "$ref": "defs.y.topBlock" },
+          "start": 0.16
+        },
+        {
+          "kind": "text",
+          "role": "sub",
+          "text": "${copy.benefit1}",
+          "style": { "$ref": "defs.type.body" },
+          "maxWidthPct": { "$ref": "defs.width.text" },
+          "maxLines": 2,
+          "anchor": "top-left",
+          "xPct": { "$switch": { "on": "orientation", "cases": { "landscape": 11 }, "default": 12.5 } },
+          "yPct": { "$ref": "defs.y.topBlock" },
+          "start": 0.3,
+          "anim": "slide-left",
+          "animDuration": 0.4
+        }
+      ]
+    },
+
+    {
+      "id": "benefit2",
+      "asset": "hero3",
+      "duration": 3.6,
+      "motion": "zoom-out",
+      "motionIntensity": 0.5,
+      "transitionIn": "fade",
+      "transitionDuration": 0.45,
+      "grade": { "$ref": "defs.grade" },
+      "overlays": [
+        { "$ref": "defs.scrimBottom", "heightPct": 46, "strength": 0.7 },
+        {
+          "$ref": "defs.rule.horizontal",
+          "anchor": "bottom-right",
+          "xPct": { "$ref": "defs.grid.marginNeg" },
+          "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -34 }, "default": -42 } },
+          "start": 0.16
+        },
+        {
+          "kind": "text",
+          "role": "sub",
+          "text": "${copy.benefit2}",
+          "style": { "$ref": "defs.type.bodyRight" },
+          "maxWidthPct": { "$ref": "defs.width.text" },
+          "maxLines": 2,
+          "anchor": "bottom-right",
+          "xPct": { "$ref": "defs.grid.marginNeg" },
+          "yPct": { "$ref": "defs.y.contentBottom" },
+          "start": 0.3,
+          "anim": "slide-up",
+          "animDuration": 0.4
+        }
+      ]
+    },
+
+    {
+      "id": "close",
+      "asset": "hero4",
+      "duration": 4.6,
+      "motion": "zoom-in",
+      "motionIntensity": 0.35,
+      "transitionIn": "fade",
+      "transitionDuration": 0.5,
+      "grade": { "brightness": -0.08, "contrast": 1.04, "saturation": 0.82, "blurPx": 0 },
+      "overlays": [
+        { "$ref": "defs.scrimBottom", "side": "full", "heightPct": 100, "strength": 0.42 },
+        {
+          "kind": "image",
+          "role": "logo",
+          "id": "logoLockup",
+          "file": "assets/logo.png",
+          "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 20, "square": 30 }, "default": 36 } },
+          "anchor": "center",
+          "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -14 }, "default": -13 } },
+          "start": 0.3,
+          "anim": "fade",
+          "animDuration": 0.6,
+          "outDuration": 0
+        },
+        {
+          "$ref": "defs.rule.horizontal",
+          "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.5 }, "default": 5.5 } },
+          "anchor": "center",
+          "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -4 }, "default": -4 } },
+          "anim": "fade",
+          "animDuration": 0.5,
+          "start": 0.62
+        },
+        {
+          "kind": "text",
+          "role": "price",
+          "text": "${copy.offer}",
+          "style": { "$ref": "defs.type.offer" },
+          "maxWidthPct": { "$ref": "defs.width.text" },
+          "maxLines": 1,
+          "anchor": "center",
+          "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": 5 }, "default": 4 } },
+          "start": 0.78,
+          "anim": "fade",
+          "animDuration": 0.5,
+          "outDuration": 0
+        }
+      ]
+    }
+  ],
+
+  "overlays": [
+    {
+      "kind": "image",
+      "role": "logo",
+      "id": "logoCorner",
+      "file": "assets/logo.png",
+      "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 9, "square": 12 }, "default": 14 } },
+      "anchor": "top-left",
+      "xPct": { "$ref": "defs.grid.margin" },
+      "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": 7 }, "default": 9 } },
+      "start": 0.6,
+      "end": 10.2,
+      "anim": "fade",
+      "animDuration": 0.7,
+      "outDuration": 0.4,
+      "opacity": 0.9
+    },
+    {
+      "kind": "band",
+      "id": "ctaBar",
+      "color": "${brand.primary}",
+      "widthPct": { "$ref": "defs.width.bar" },
+      "heightPct": { "$switch": { "on": "orientation", "cases": { "landscape": 10.5, "square": 9 }, "default": 8 } },
+      "radiusPct": 0,
+      "anchor": "bottom-center",
+      "yPct": { "$ref": "defs.y.ctaBar" },
+      "start": { "$switch": { "on": "axis:ctaTiming", "cases": { "early": 7.5, "late": 11.3 } } },
+      "anim": "slide-up",
+      "animDuration": 0.4,
+      "outDuration": 0
+    },
+    {
+      "kind": "text",
+      "role": "cta",
+      "id": "cta",
+      "text": "${copy.cta}",
+      "style": { "$ref": "defs.type.cta" },
+      "maxWidthPct": { "$ref": "defs.width.bar" },
+      "maxLines": 1,
+      "anchor": "bottom-center",
+      "yPct": {
+        "$switch": {
+          "on": "orientation",
+          "cases": { "landscape": -13.5, "square": -15.8 },
+          "default": -19.2
+        }
+      },
+      "start": { "$switch": { "on": "axis:ctaTiming", "cases": { "early": 7.62, "late": 11.42 } } },
+      "anim": "slide-up",
+      "animDuration": 0.4,
+      "outDuration": 0
+    }
+  ]
+}

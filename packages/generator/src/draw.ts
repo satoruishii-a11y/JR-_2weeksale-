@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createCanvas, loadImage, GlobalFonts, type SKRSContext2D } from '@napi-rs/canvas';
 import type {
   Anchor,
@@ -41,7 +42,15 @@ const NO_LINE_START = new Set(
 /** 行末に置かない文字 */
 const NO_LINE_END = new Set('（「『【〔《〈“‘([{'.split(''));
 
+/** 縦書きで 90 度回転させる文字。長音・括弧類・英数・記号 */
+const VERTICAL_ROTATE = /^[ー〜～（）()「」『』【】〔〕《》〈〉｛｝{}[\]:;=+<>~\-–—A-Za-z0-9,.%]$/;
+/** 縦書きで字面を右上に寄せる文字 */
+const VERTICAL_TOP_RIGHT = new Set('、。，．'.split(''));
+
 export type FontRegistry = Map<string, string>;
+
+/** パッケージルート。node_modules に入れたフォントを project.json から参照できるようにする */
+const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /** project.fonts の定義を登録し、キー -> 実際に使えるファミリ名の対応表を返す */
 export function registerFonts(project: Project, projectDir: string): FontRegistry {
@@ -49,12 +58,17 @@ export function registerFonts(project: Project, projectDir: string): FontRegistr
 
   const tryRegister = (key: string, candidates: string[]): boolean => {
     for (const candidate of candidates) {
-      const abs = path.isAbsolute(candidate) ? candidate : path.resolve(projectDir, candidate);
-      if (!existsSync(abs)) continue;
-      const family = `cg-${key}`;
-      if (GlobalFonts.registerFromPath(abs, family)) {
-        registry.set(key, family);
-        return true;
+      // 相対パスは案件ディレクトリ → パッケージルートの順に探す。
+      // 後者があるので "node_modules/@expo-google-fonts/..." をそのまま書ける
+      const roots = path.isAbsolute(candidate) ? [''] : [projectDir, PACKAGE_ROOT];
+      for (const root of roots) {
+        const abs = root ? path.resolve(root, candidate) : candidate;
+        if (!existsSync(abs)) continue;
+        const family = `cg-${key}`;
+        if (GlobalFonts.registerFromPath(abs, family)) {
+          registry.set(key, family);
+          return true;
+        }
       }
     }
     return false;
@@ -75,8 +89,21 @@ export function registerFonts(project: Project, projectDir: string): FontRegistr
   return registry;
 }
 
+const warnedFontKeys = new Set<string>();
+
 function familyOf(registry: FontRegistry, key: string): string {
-  return registry.get(key) ?? registry.get('default')!;
+  const family = registry.get(key);
+  if (family) return family;
+
+  // 黙って default に落ちると「別の書体で刷られた」ことに気づけないので必ず知らせる
+  if (!warnedFontKeys.has(key)) {
+    warnedFontKeys.add(key);
+    console.warn(
+      `[fonts] テンプレートが参照している "${key}" が project.json の fonts にありません。` +
+        `default で代替します（利用可能: ${[...registry.keys()].join(', ')}）`,
+    );
+  }
+  return registry.get('default')!;
 }
 
 /* ------------------------------------------------------------------ *
@@ -206,7 +233,162 @@ function layoutAt(
   };
 }
 
+/* ------------------------------------------------------------------ *
+ * 縦書き
+ * ------------------------------------------------------------------ */
+
+interface VerticalLayout {
+  fontSize: number;
+  columns: string[][];
+  cellAdvance: number;
+  columnAdvance: number;
+  strokeWidth: number;
+  margin: number;
+  padX: number;
+  padY: number;
+}
+
+function layoutVerticalAt(
+  text: string,
+  style: TextStyle,
+  fontSize: number,
+  outerMaxHeight: number,
+): VerticalLayout {
+  // 和文は字面が正方形なので、送りは字幅を実測せず em 基準で決められる
+  const cellAdvance = fontSize * (1 + style.letterSpacingEm);
+  const columnAdvance = fontSize * style.lineHeight;
+
+  const strokeWidth = (fontSize * style.strokeWidthPct) / 100;
+  const padX = style.band ? fontSize * style.band.paddingXEm : 0;
+  const padY = style.band ? fontSize * style.band.paddingYEm : 0;
+  const shadowReach = style.shadow
+    ? fontSize * (style.shadow.blurEm + Math.abs(style.shadow.offsetXEm) + Math.abs(style.shadow.offsetYEm))
+    : 0;
+  const margin = Math.ceil(strokeWidth + shadowReach + 4);
+
+  const usableHeight = Math.max(cellAdvance, outerMaxHeight - padY * 2 - margin * 2);
+  const perColumn = Math.max(1, Math.floor(usableHeight / cellAdvance));
+
+  const columns: string[][] = [];
+  for (const para of text.split('\n')) {
+    const chars = Array.from(para);
+    if (chars.length === 0) continue;
+    for (let i = 0; i < chars.length; ) {
+      let end = Math.min(i + perColumn, chars.length);
+      if (end < chars.length) {
+        // 列頭禁則: 次列の先頭が句読点などなら現在列にぶら下げる
+        while (end < chars.length && NO_LINE_START.has(chars[end]!)) end++;
+        while (end - 1 > i && NO_LINE_END.has(chars[end - 1]!)) end--;
+        if (end <= i) end = i + 1;
+      }
+      columns.push(chars.slice(i, end));
+      i = end;
+    }
+  }
+  if (columns.length === 0) columns.push([]);
+
+  return { fontSize, columns, cellAdvance, columnAdvance, strokeWidth, margin, padX, padY };
+}
+
+function renderVerticalText(
+  overlay: TextOverlay,
+  target: RenderTarget,
+  fonts: FontRegistry,
+): TextBitmap {
+  const style = overlay.style;
+  const family = familyOf(fonts, style.font);
+  const outerMaxHeight = (target.height * overlay.maxHeightPct) / 100;
+
+  const baseSize = Math.max(8, Math.round((target.height * style.sizePct) / 100));
+  const minSize = Math.max(
+    8,
+    Math.round(style.minSizePct ? (target.height * style.minSizePct) / 100 : baseSize * 0.62),
+  );
+
+  // 列数がはみ出す限り少しずつ縮める（横書きと同じ考え方）
+  let layout = layoutVerticalAt(overlay.text, style, baseSize, outerMaxHeight);
+  if (overlay.maxLines) {
+    let size = baseSize;
+    while (layout.columns.length > overlay.maxLines && size > minSize) {
+      size = Math.max(minSize, Math.floor(size * 0.96));
+      layout = layoutVerticalAt(overlay.text, style, size, outerMaxHeight);
+    }
+  }
+
+  const { fontSize, columns, cellAdvance, columnAdvance, strokeWidth, margin, padX, padY } = layout;
+  const longest = Math.max(1, ...columns.map((c) => c.length));
+
+  const width = Math.ceil(columnAdvance * columns.length + padX * 2 + margin * 2);
+  const height = Math.ceil(cellAdvance * longest + padY * 2 + margin * 2);
+
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+  ctx.font = `${fontSize}px "${family}"`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.miterLimit = 2;
+
+  if (style.band) {
+    ctx.fillStyle = style.band.color;
+    roundRect(ctx, margin, margin, width - margin * 2, height - margin * 2, fontSize * style.band.radiusEm);
+    ctx.fill();
+  }
+
+  const drawGlyph = (ch: string, cx: number, cy: number): void => {
+    const rotate = VERTICAL_ROTATE.test(ch);
+    ctx.save();
+    if (VERTICAL_TOP_RIGHT.has(ch)) {
+      // 句読点は枡目の右上に寄せる
+      ctx.translate(cx + fontSize * 0.26, cy - fontSize * 0.28);
+    } else {
+      ctx.translate(cx, cy);
+      if (rotate) ctx.rotate(Math.PI / 2);
+    }
+    if (strokeWidth > 0 && style.strokeColor) {
+      ctx.strokeStyle = style.strokeColor;
+      ctx.lineWidth = strokeWidth * 2;
+      ctx.strokeText(ch, 0, 0);
+    }
+    ctx.fillStyle = style.color;
+    ctx.fillText(ch, 0, 0);
+    ctx.restore();
+  };
+
+  const drawAll = (): void => {
+    columns.forEach((column, j) => {
+      // 列は右から左へ進む
+      const cx = width - margin - padX - columnAdvance * (j + 0.5);
+      column.forEach((ch, k) => {
+        drawGlyph(ch, cx, margin + padY + cellAdvance * (k + 0.5));
+      });
+    });
+  };
+
+  if (style.shadow) {
+    ctx.save();
+    ctx.shadowColor = style.shadow.color;
+    ctx.shadowBlur = fontSize * style.shadow.blurEm;
+    ctx.shadowOffsetX = fontSize * style.shadow.offsetXEm;
+    ctx.shadowOffsetY = fontSize * style.shadow.offsetYEm;
+    drawAll();
+    ctx.restore();
+  }
+  drawAll();
+
+  return {
+    buffer: canvas.toBuffer('image/png'),
+    width,
+    height,
+    lines: columns.map((c) => c.join('')),
+    fontSizePx: fontSize,
+    overflowedLines: Boolean(overlay.maxLines && columns.length > overlay.maxLines),
+  };
+}
+
 export function renderText(overlay: TextOverlay, target: RenderTarget, fonts: FontRegistry): TextBitmap {
+  if (overlay.style.writingMode === 'vertical') return renderVerticalText(overlay, target, fonts);
+
   const style: TextStyle = overlay.style;
   const family = familyOf(fonts, style.font);
   const outerMaxWidth = (target.width * overlay.maxWidthPct) / 100;

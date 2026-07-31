@@ -124,6 +124,11 @@ export const TextStyleSchema = z.object({
   lineHeight: z.number().positive().default(1.32),
   letterSpacingEm: z.number().default(0.02),
   align: z.enum(['left', 'center', 'right']).default('center'),
+  /**
+   * vertical は縦書き。列は右から左へ進み、長音・括弧・英数は 90 度回転させる。
+   * 和文の広告らしさが一番出る指定なので、大見出しに使う。
+   */
+  writingMode: z.enum(['horizontal', 'vertical']).default('horizontal'),
   /** テキスト背面の帯 */
   band: z
     .object({
@@ -170,7 +175,9 @@ export const TextOverlaySchema = z.object({
   text: z.string(),
   /** 折り返し幅（キャンバス幅に対する %）。帯の余白と縁取りを含めた外寸 */
   maxWidthPct: z.number().positive().default(84),
-  /** 指定するとこの行数に収まるまで自動で文字を縮める */
+  /** 縦書きのときの折り返し高さ（キャンバス高に対する %） */
+  maxHeightPct: z.number().positive().default(60),
+  /** 指定するとこの行数（縦書きなら列数）に収まるまで自動で文字を縮める */
   maxLines: z.number().int().positive().optional(),
   style: TextStyleSchema,
   /** 分析用の意味ラベル。決定タグにそのまま入る */

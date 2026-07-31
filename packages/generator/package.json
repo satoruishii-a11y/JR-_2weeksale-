@@ -17,6 +17,8 @@
     "demo-kyoto": "npm run kyoto-assets && tsx src/cli.ts render --project projects/kyoto-koyo --template hook-price --strategy orthogonal:5 --ratios 9x16,16x9 --contact-sheet"
   },
   "dependencies": {
+    "@expo-google-fonts/noto-sans-jp": "^0.4.3",
+    "@expo-google-fonts/noto-serif-jp": "^0.4.3",
     "@napi-rs/canvas": "^0.1.60",
     "ffmpeg-static": "^5.2.0",
     "zod": "^3.23.8"

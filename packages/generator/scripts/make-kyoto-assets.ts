@@ -203,6 +203,10 @@ function grain(ctx: SKRSContext2D, rand: () => number, amount = 42000): void {
   ctx.restore();
 }
 
+// カット間のトーン統一は素材側でやらず、テンプレートの scenes[].grade
+// （ffmpeg の eq フィルタ）で行う。素材は素のまま置いておくほうが、
+// 実写に差し替えたときに同じ調整がそのまま効く。
+
 /** 上下のビネット。テロップの見え方を実素材に近づける */
 function vignette(ctx: SKRSContext2D, topStrength = 0.3, bottomStrength = 0.34): void {
   const g = ctx.createLinearGradient(0, 0, 0, H);
@@ -228,8 +232,9 @@ function sceneApproach(ctx: SKRSContext2D): void {
     [1, '#F6D69B'],
   ]);
 
-  // 奥に抜ける光
-  const glow = ctx.createRadialGradient(W * 0.5, H * 0.62, 0, W * 0.5, H * 0.62, W * 0.55);
+  // 奥に抜ける光。中央ではなく左三分割に置き、右側を縦書きが乗る余白にする
+  const vanishX = W * 0.38;
+  const glow = ctx.createRadialGradient(vanishX, H * 0.62, 0, vanishX, H * 0.62, W * 0.5);
   glow.addColorStop(0, 'rgba(255,240,200,0.92)');
   glow.addColorStop(0.35, 'rgba(255,220,160,0.35)');
   glow.addColorStop(1, 'rgba(255,210,150,0)');
@@ -244,22 +249,20 @@ function sceneApproach(ctx: SKRSContext2D): void {
   road.addColorStop(0.3, 'rgba(226,186,140,0.85)');
   road.addColorStop(1, 'rgba(126,84,62,0.9)');
   ctx.fillStyle = road;
-  ctx.beginPath();
-  ctx.moveTo(W * 0.5 - 60, pathTopY);
-  ctx.lineTo(W * 0.5 + 60, pathTopY);
-  ctx.lineTo(W * 1.16, H);
-  ctx.lineTo(-W * 0.16, H);
-  ctx.closePath();
+  const roadPath = () => {
+    ctx.beginPath();
+    ctx.moveTo(vanishX - 60, pathTopY);
+    ctx.lineTo(vanishX + 60, pathTopY);
+    ctx.lineTo(W * 1.02, H);
+    ctx.lineTo(-W * 0.3, H);
+    ctx.closePath();
+  };
+  roadPath();
   ctx.fill();
 
   // 石畳の横目。奥ほど間隔を詰めて距離感を出す
   ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(W * 0.5 - 60, pathTopY);
-  ctx.lineTo(W * 0.5 + 60, pathTopY);
-  ctx.lineTo(W * 1.16, H);
-  ctx.lineTo(-W * 0.16, H);
-  ctx.closePath();
+  roadPath();
   ctx.clip();
   for (let i = 0; i < 18; i++) {
     const t = i / 17;
@@ -278,7 +281,7 @@ function sceneApproach(ctx: SKRSContext2D): void {
     for (let i = 0; i < 6; i++) {
       const t = i / 5;
       const depth = Math.pow(t, 1.5);
-      const x = W * 0.5 + side * (100 + depth * W * 0.6);
+      const x = vanishX + side * (100 + depth * W * 0.6);
       const topY = H * 0.58 - depth * H * 0.5;
       const width = 30 + depth * 150;
       const lean = side * depth * 46;
@@ -304,6 +307,13 @@ function sceneApproach(ctx: SKRSContext2D): void {
     mapleLeaf(ctx, rand() * W, y, 20 + rand() * 46, (rand() - 0.5) * 3, AUTUMN[Math.floor(rand() * AUTUMN.length)]!);
   }
 
+  // 右側を落として縦書きの背景を作る
+  const rightShade = ctx.createLinearGradient(W * 0.42, 0, W, 0);
+  rightShade.addColorStop(0, 'rgba(20,10,8,0)');
+  rightShade.addColorStop(1, 'rgba(20,10,8,0.5)');
+  ctx.fillStyle = rightShade;
+  ctx.fillRect(0, 0, W, H);
+
   vignette(ctx, 0.24, 0.4);
   grain(ctx, rand);
 }
@@ -323,7 +333,7 @@ function scenePagoda(ctx: SKRSContext2D): void {
 
   // 太陽
   const sunY = H * 0.66;
-  const sun = ctx.createRadialGradient(W * 0.66, sunY, 0, W * 0.66, sunY, 420);
+  const sun = ctx.createRadialGradient(W * 0.3, sunY, 0, W * 0.3, sunY, 420);
   sun.addColorStop(0, 'rgba(255,246,214,0.98)');
   sun.addColorStop(0.18, 'rgba(255,220,150,0.7)');
   sun.addColorStop(1, 'rgba(255,200,130,0)');
@@ -336,7 +346,7 @@ function scenePagoda(ctx: SKRSContext2D): void {
   ridge(ctx, mulberry32(33), H * 0.83, 90, 'rgba(54,32,36,0.78)');
 
   // 塔
-  pagoda(ctx, W * 0.36, H * 0.86, H * 0.44, 'rgba(30,20,24,0.94)');
+  pagoda(ctx, W * 0.66, H * 0.86, H * 0.44, 'rgba(30,20,24,0.94)');
 
   // 町並みのシルエット
   ctx.fillStyle = 'rgba(34,22,26,0.9)';
@@ -470,7 +480,7 @@ function sceneAlley(ctx: SKRSContext2D): void {
 
   // 奥の抜け
   const far = ctx.createRadialGradient(W * 0.5, H * 0.56, 0, W * 0.5, H * 0.56, W * 0.42);
-  far.addColorStop(0, 'rgba(255,196,120,0.42)');
+  far.addColorStop(0, 'rgba(255,196,120,0.22)');
   far.addColorStop(1, 'rgba(255,180,110,0)');
   ctx.fillStyle = far;
   ctx.fillRect(0, 0, W, H);

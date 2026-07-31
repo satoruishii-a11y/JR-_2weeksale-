@@ -3,36 +3,69 @@
   "client": "京あかり旅行（架空）",
   "campaign": "京都紅葉旅2025",
   "legalNote": "仕組み検証用のサンプル案件です。事業者名・価格・拝観内容・出発期限はすべて架空で、実在の旅行会社や商品とは関係ありません。素材写真の代わりに手続き的に描いた紅葉のイラストを使っています。実案件では価格と拝観条件の表記チェック（景表法・旅行業法）を必ず通してください。",
-
   "brand": {
-    "primary": "#8C2230",
-    "accent": "#F0BB4E",
+    "primary": "#A3323B",
+    "accent": "#C9A66B",
     "textOnPrimary": "#FFFFFF",
     "logo": "assets/logo.png"
   },
-
   "fonts": {
-    "default": [
-      "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",
-      "/usr/share/fonts/opentype/ipafont-gothic/ipagp.ttf",
+    "mincho": [
+      "node_modules/@expo-google-fonts/noto-serif-jp/900Black/NotoSerifJP_900Black.ttf",
+      "/System/Library/Fonts/ヒラギノ明朝 ProN.ttc",
+      "C:\\Windows\\Fonts\\yuminb.ttf"
+    ],
+    "minchoMid": [
+      "node_modules/@expo-google-fonts/noto-serif-jp/600SemiBold/NotoSerifJP_600SemiBold.ttf",
+      "/System/Library/Fonts/ヒラギノ明朝 ProN.ttc",
+      "C:\\Windows\\Fonts\\yumin.ttf"
+    ],
+    "gothic": [
+      "node_modules/@expo-google-fonts/noto-sans-jp/500Medium/NotoSansJP_500Medium.ttf",
+      "/System/Library/Fonts/ヒラギノ角ゴシック W4.ttc",
+      "C:\\Windows\\Fonts\\YuGothM.ttc"
+    ],
+    "gothicBold": [
+      "node_modules/@expo-google-fonts/noto-sans-jp/700Bold/NotoSansJP_700Bold.ttf",
       "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc",
       "C:\\Windows\\Fonts\\YuGothB.ttc"
     ],
     "bold": [
-      "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",
-      "/usr/share/fonts/opentype/ipafont-gothic/ipagp.ttf",
+      "node_modules/@expo-google-fonts/noto-sans-jp/700Bold/NotoSansJP_700Bold.ttf",
       "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc",
       "C:\\Windows\\Fonts\\YuGothB.ttc"
+    ],
+    "default": [
+      "node_modules/@expo-google-fonts/noto-sans-jp/500Medium/NotoSansJP_500Medium.ttf",
+      "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf"
     ]
   },
-
   "assets": [
-    { "id": "hero1", "file": "assets/koyo-approach.jpg", "role": "hero", "subject": "紅葉の参道・順光" },
-    { "id": "hero2", "file": "assets/koyo-pagoda.jpg", "role": "hero", "subject": "五重塔と夕景" },
-    { "id": "hero3", "file": "assets/koyo-river.jpg", "role": "hero", "subject": "渓谷と川・朝霧" },
-    { "id": "hero4", "file": "assets/koyo-alley.jpg", "role": "close", "subject": "石畳の路地・夜の提灯" }
+    {
+      "id": "hero1",
+      "file": "assets/koyo-approach.jpg",
+      "role": "hero",
+      "subject": "紅葉の参道・順光"
+    },
+    {
+      "id": "hero2",
+      "file": "assets/koyo-pagoda.jpg",
+      "role": "hero",
+      "subject": "五重塔と夕景"
+    },
+    {
+      "id": "hero3",
+      "file": "assets/koyo-river.jpg",
+      "role": "hero",
+      "subject": "渓谷と川・朝霧"
+    },
+    {
+      "id": "hero4",
+      "file": "assets/koyo-alley.jpg",
+      "role": "close",
+      "subject": "石畳の路地・夜の提灯"
+    }
   ],
-
   "copy": {
     "kicker": "紅葉シーズン限定",
     "hook": {
@@ -46,6 +79,5 @@
     "offerShort": "11/30出発分まで",
     "cta": "「京あかり旅」で検索"
   },
-
   "bgm": "assets/bgm.mp3"
 }
