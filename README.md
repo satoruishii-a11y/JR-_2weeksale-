@@ -29,17 +29,23 @@
 ```bash
 cd packages/generator
 npm install
-npm run demo
+
+npm run demo-kyoto   # 京都紅葉旅: 5パターン × 縦横2比率 = 10本
+npm run demo         # 交通費セール: 6パターン × 3比率 = 18本
 ```
 
-`npm run demo` はダミー素材を生成してから、6パターン × 3比率 = 18本を書き出します
-（4コアで約8分）。終わったら次のファイルをブラウザで開いてください。
+素材の生成から動画の書き出しまで通して走ります（10本で4コア約7分）。
+終わったら次のファイルをブラウザで開いてください。
 
 ```
-packages/generator/projects/sample-2weeksale/out/index.html
+packages/generator/projects/kyoto-koyo/out/index.html
 ```
 
 パターンが一覧で並び、軸（フック／テロップ表現／CTAタイミング）でフィルタできます。
+
+同梱案件の素材はどちらも実写ではありません（手続き的に描いたイラストです）。
+実写に差し替えるときは `projects/<案件>/assets/` のファイルを置き換えるだけで、
+テンプレートも `project.json` も触りません。
 
 短時間で確認したい場合:
 
@@ -108,8 +114,10 @@ packages/generator/                   ① 作る（実装済み）
     hook-price.json                     オファー訴求15秒・4カット
     bumper-6s.json                      バンパー6秒・2カット
   projects/                            案件（素材とコピー）
-    sample-2weeksale/
+    sample-2weeksale/                   交通費割引セール
+    kyoto-koyo/                         京都紅葉旅
   scripts/make-sample-assets.ts        デモ用ダミー素材の生成
+  scripts/make-kyoto-assets.ts         紅葉の情景イラストの生成
 ```
 
 素材と生成物は `.gitignore` に入れています。生成物は `creative_id` から常に再生成でき、

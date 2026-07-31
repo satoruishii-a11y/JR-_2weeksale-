@@ -17,6 +17,16 @@ npm install
 npm run sample-assets   # デモ用のダミー素材を生成
 ```
 
+同梱の案件は2つあります。
+
+| 案件 | 内容 | 素材生成 | 一括デモ |
+|---|---|---|---|
+| `projects/sample-2weeksale` | 交通費割引セール。抽象グラデーションの素材 | `npm run sample-assets` | `npm run demo` |
+| `projects/kyoto-koyo` | 京都紅葉旅。紅葉の情景を手続き的に描いた素材 | `npm run kyoto-assets` | `npm run demo-kyoto` |
+
+どちらの素材も実写ではありません。実写に差し替えるときは
+`projects/<案件>/assets/` のファイルを置き換えるだけで、テンプレートも `project.json` も触りません。
+
 ffmpeg は `ffmpeg-static` として入るので個別インストールは不要です。
 システムのものを使う場合は `FFMPEG_PATH` を設定してください。
 

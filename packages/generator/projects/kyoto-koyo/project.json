@@ -1,0 +1,51 @@
+{
+  "slug": "kyoto-koyo",
+  "client": "京あかり旅行（架空）",
+  "campaign": "京都紅葉旅2025",
+  "legalNote": "仕組み検証用のサンプル案件です。事業者名・価格・拝観内容・出発期限はすべて架空で、実在の旅行会社や商品とは関係ありません。素材写真の代わりに手続き的に描いた紅葉のイラストを使っています。実案件では価格と拝観条件の表記チェック（景表法・旅行業法）を必ず通してください。",
+
+  "brand": {
+    "primary": "#8C2230",
+    "accent": "#F0BB4E",
+    "textOnPrimary": "#FFFFFF",
+    "logo": "assets/logo.png"
+  },
+
+  "fonts": {
+    "default": [
+      "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",
+      "/usr/share/fonts/opentype/ipafont-gothic/ipagp.ttf",
+      "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc",
+      "C:\\Windows\\Fonts\\YuGothB.ttc"
+    ],
+    "bold": [
+      "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",
+      "/usr/share/fonts/opentype/ipafont-gothic/ipagp.ttf",
+      "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc",
+      "C:\\Windows\\Fonts\\YuGothB.ttc"
+    ]
+  },
+
+  "assets": [
+    { "id": "hero1", "file": "assets/koyo-approach.jpg", "role": "hero", "subject": "紅葉の参道・順光" },
+    { "id": "hero2", "file": "assets/koyo-pagoda.jpg", "role": "hero", "subject": "五重塔と夕景" },
+    { "id": "hero3", "file": "assets/koyo-river.jpg", "role": "hero", "subject": "渓谷と川・朝霧" },
+    { "id": "hero4", "file": "assets/koyo-alley.jpg", "role": "close", "subject": "石畳の路地・夜の提灯" }
+  ],
+
+  "copy": {
+    "kicker": "紅葉シーズン限定",
+    "hook": {
+      "price": "京都の紅葉2日間\n29,800円〜",
+      "scarcity": "紅葉の見ごろは\nあと10日",
+      "question": "今年の紅葉は\nどこで見ますか"
+    },
+    "benefit1": "永観堂・東福寺\n夜間拝観つき",
+    "benefit2": "嵐山・渡月橋まで\n徒歩10分の宿",
+    "offer": "11月30日出発分まで",
+    "offerShort": "11/30出発分まで",
+    "cta": "「京あかり旅」で検索"
+  },
+
+  "bgm": "assets/bgm.mp3"
+}
