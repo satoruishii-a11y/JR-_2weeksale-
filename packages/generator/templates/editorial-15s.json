@@ -116,8 +116,8 @@
       "horizontal": {
         "kind": "band",
         "color": "${brand.accent}",
-        "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 4.5 }, "default": 7 } },
-        "heightPct": { "$switch": { "on": "orientation", "cases": { "landscape": 0.38 }, "default": 0.24 } },
+        "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 7 }, "default": 11 } },
+        "heightPct": { "$switch": { "on": "orientation", "cases": { "landscape": 0.72 }, "default": 0.48 } },
         "radiusPct": 0,
         "anim": "slide-right",
         "animDuration": 0.42,
@@ -126,8 +126,8 @@
       "vertical": {
         "kind": "band",
         "color": "${brand.accent}",
-        "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 0.22 }, "default": 0.36 } },
-        "heightPct": { "$switch": { "on": "orientation", "cases": { "landscape": 9 }, "default": 6.5 } },
+        "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 0.36 }, "default": 0.62 } },
+        "heightPct": { "$switch": { "on": "orientation", "cases": { "landscape": 11 }, "default": 9 } },
         "radiusPct": 0,
         "anim": "slide-up",
         "animDuration": 0.42,
@@ -150,9 +150,9 @@
     "scrimBottom": {
       "kind": "scrim",
       "side": "bottom",
-      "heightPct": 52,
+      "heightPct": 58,
       "color": "#120E0B",
-      "strength": 0.74,
+      "strength": 0.82,
       "anim": "none",
       "start": 0
     },
@@ -179,8 +179,8 @@
         { "$ref": "defs.scrimBottom" },
         {
           "$ref": "defs.scrimTop",
-          "heightPct": 34,
-          "strength": { "$switch": { "on": "axis:typeStyle", "cases": { "tate": 0.5 }, "default": 0.3 } }
+          "heightPct": 36,
+          "strength": 0.54
         },
 
         {
@@ -232,7 +232,7 @@
                 "$ref": "defs.rule.horizontal",
                 "anchor": "bottom-left",
                 "xPct": { "$ref": "defs.grid.margin" },
-                "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -32 }, "default": -40 } },
+                "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -24 }, "default": -31 } },
                 "start": 0.18
               },
               "yoko": {
@@ -259,7 +259,7 @@
                 "maxLines": 1,
                 "anchor": "bottom-left",
                 "xPct": { "$ref": "defs.grid.margin" },
-                "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -24 }, "default": -33 } },
+                "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -17 }, "default": -24 } },
                 "start": 0.26,
                 "anim": "slide-up",
                 "animDuration": 0.36
@@ -289,8 +289,8 @@
       "id": "benefit1",
       "asset": "hero2",
       "duration": 3.6,
-      "motion": "pan-right",
-      "motionIntensity": 0.55,
+      "motion": "zoom-in",
+      "motionIntensity": 0.8,
       "transitionIn": "fade",
       "transitionDuration": 0.45,
       "grade": { "$ref": "defs.grade" },
@@ -330,7 +330,7 @@
       "transitionDuration": 0.45,
       "grade": { "$ref": "defs.grade" },
       "overlays": [
-        { "$ref": "defs.scrimBottom", "heightPct": 46, "strength": 0.7 },
+        { "$ref": "defs.scrimBottom", "heightPct": 60, "strength": 0.88 },
         {
           "$ref": "defs.rule.horizontal",
           "anchor": "bottom-right",
@@ -363,9 +363,9 @@
       "motionIntensity": 0.35,
       "transitionIn": "fade",
       "transitionDuration": 0.5,
-      "grade": { "brightness": -0.08, "contrast": 1.04, "saturation": 0.82, "blurPx": 0 },
+      "grade": { "brightness": 0.04, "contrast": 1.06, "saturation": 0.86, "blurPx": 0 },
       "overlays": [
-        { "$ref": "defs.scrimBottom", "side": "full", "heightPct": 100, "strength": 0.42 },
+        { "$ref": "defs.scrimBottom", "side": "full", "heightPct": 100, "strength": 0.3 },
         {
           "kind": "image",
           "role": "logo",
@@ -373,7 +373,7 @@
           "file": "assets/logo.png",
           "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 20, "square": 30 }, "default": 36 } },
           "anchor": "center",
-          "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -14 }, "default": -13 } },
+          "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -13 }, "default": -12 } },
           "start": 0.3,
           "anim": "fade",
           "animDuration": 0.6,
@@ -381,9 +381,10 @@
         },
         {
           "$ref": "defs.rule.horizontal",
-          "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.5 }, "default": 5.5 } },
+          "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 6 }, "default": 10 } },
+          "heightPct": { "$switch": { "on": "orientation", "cases": { "landscape": 0.9 }, "default": 0.6 } },
           "anchor": "center",
-          "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -4 }, "default": -4 } },
+          "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": -4 }, "default": -4.5 } },
           "anim": "fade",
           "animDuration": 0.5,
           "start": 0.62
@@ -396,7 +397,7 @@
           "maxWidthPct": { "$ref": "defs.width.text" },
           "maxLines": 1,
           "anchor": "center",
-          "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": 5 }, "default": 4 } },
+          "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": 4 }, "default": 3 } },
           "start": 0.78,
           "anim": "fade",
           "animDuration": 0.5,

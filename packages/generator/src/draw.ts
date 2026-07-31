@@ -42,10 +42,52 @@ const NO_LINE_START = new Set(
 /** 行末に置かない文字 */
 const NO_LINE_END = new Set('（「『【〔《〈“‘([{'.split(''));
 
-/** 縦書きで 90 度回転させる文字。長音・括弧類・英数・記号 */
-const VERTICAL_ROTATE = /^[ー〜～（）()「」『』【】〔〕《》〈〉｛｝{}[\]:;=+<>~\-–—A-Za-z0-9,.%]$/;
+/**
+ * 縦書きで 90 度回転させる文字。長音・波・括弧類とラテン文字。
+ * 数字は回転させない。和文の縦組みでは1桁は正立、2桁以上は縦中横が正しい。
+ */
+const VERTICAL_ROTATE = /^[ー〜～（）()「」『』【】〔〕《》〈〉｛｝{}[\]:;=+<>~\-–—A-Za-z]$/;
 /** 縦書きで字面を右上に寄せる文字 */
 const VERTICAL_TOP_RIGHT = new Set('、。，．'.split(''));
+/** 縦中横（1マスに横組みで詰める）にできる数字列の最大字数 */
+const TCY_MAX_CHARS = 4;
+
+/**
+ * 縦書きの1マスぶんに切り分ける。数字の連続は「29」のように1マスへ横組みで入れる。
+ * 5桁以上を1マスに潰すと読めないので、その場合は1文字ずつ正立で積む。
+ */
+function toVerticalCells(chars: string[]): string[] {
+  const cells: string[] = [];
+  for (let i = 0; i < chars.length; ) {
+    if (!/[0-9]/.test(chars[i]!)) {
+      cells.push(chars[i]!);
+      i++;
+      continue;
+    }
+    let j = i;
+    while (j < chars.length && /[0-9,.:]/.test(chars[j]!)) j++;
+    // 末尾の区切り記号は数字列に含めない
+    while (j > i && /[,.:]/.test(chars[j - 1]!)) j--;
+    const run = chars.slice(i, j).join('');
+    if (run.length >= 2 && run.length <= TCY_MAX_CHARS) {
+      cells.push(run);
+    } else {
+      for (const ch of chars.slice(i, j)) cells.push(ch);
+    }
+    i = j;
+  }
+  return cells;
+}
+
+/** 泣き別れ（最終行が1文字だけ）を避ける。直前の行から1文字送る */
+function avoidOrphan(lines: string[][]): void {
+  if (lines.length < 2) return;
+  const last = lines[lines.length - 1]!;
+  const prev = lines[lines.length - 2]!;
+  if (last.length === 1 && prev.length >= 3) {
+    last.unshift(prev.pop()!);
+  }
+}
 
 export type FontRegistry = Map<string, string>;
 
@@ -218,7 +260,9 @@ function layoutAt(
       lines.push([]);
       continue;
     }
-    lines.push(...wrapLine(probe, chars, textMaxWidth, letterSpacing));
+    const wrapped = wrapLine(probe, chars, textMaxWidth, letterSpacing);
+    avoidOrphan(wrapped);
+    lines.push(...wrapped);
   }
 
   return {
@@ -271,19 +315,21 @@ function layoutVerticalAt(
 
   const columns: string[][] = [];
   for (const para of text.split('\n')) {
-    const chars = Array.from(para);
-    if (chars.length === 0) continue;
-    for (let i = 0; i < chars.length; ) {
-      let end = Math.min(i + perColumn, chars.length);
-      if (end < chars.length) {
+    const cells = toVerticalCells(Array.from(para));
+    if (cells.length === 0) continue;
+    const start = columns.length;
+    for (let i = 0; i < cells.length; ) {
+      let end = Math.min(i + perColumn, cells.length);
+      if (end < cells.length) {
         // 列頭禁則: 次列の先頭が句読点などなら現在列にぶら下げる
-        while (end < chars.length && NO_LINE_START.has(chars[end]!)) end++;
-        while (end - 1 > i && NO_LINE_END.has(chars[end - 1]!)) end--;
+        while (end < cells.length && NO_LINE_START.has(cells[end]!)) end++;
+        while (end - 1 > i && NO_LINE_END.has(cells[end - 1]!)) end--;
         if (end <= i) end = i + 1;
       }
-      columns.push(chars.slice(i, end));
+      columns.push(cells.slice(i, end));
       i = end;
     }
+    avoidOrphan(columns.slice(start));
   }
   if (columns.length === 0) columns.push([]);
 
@@ -335,23 +381,27 @@ function renderVerticalText(
     ctx.fill();
   }
 
-  const drawGlyph = (ch: string, cx: number, cy: number): void => {
-    const rotate = VERTICAL_ROTATE.test(ch);
+  const drawGlyph = (cell: string, cx: number, cy: number): void => {
     ctx.save();
-    if (VERTICAL_TOP_RIGHT.has(ch)) {
+    if (cell.length > 1) {
+      // 縦中横: 数字列を1マス幅に収まるよう水平方向だけ圧縮して正立で置く
+      const natural = ctx.measureText(cell).width;
+      ctx.translate(cx, cy);
+      ctx.scale(Math.min(1, fontSize / Math.max(1, natural)), 1);
+    } else if (VERTICAL_TOP_RIGHT.has(cell)) {
       // 句読点は枡目の右上に寄せる
       ctx.translate(cx + fontSize * 0.26, cy - fontSize * 0.28);
     } else {
       ctx.translate(cx, cy);
-      if (rotate) ctx.rotate(Math.PI / 2);
+      if (VERTICAL_ROTATE.test(cell)) ctx.rotate(Math.PI / 2);
     }
     if (strokeWidth > 0 && style.strokeColor) {
       ctx.strokeStyle = style.strokeColor;
       ctx.lineWidth = strokeWidth * 2;
-      ctx.strokeText(ch, 0, 0);
+      ctx.strokeText(cell, 0, 0);
     }
     ctx.fillStyle = style.color;
-    ctx.fillText(ch, 0, 0);
+    ctx.fillText(cell, 0, 0);
     ctx.restore();
   };
 
