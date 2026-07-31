@@ -1,0 +1,16 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+.env
+.env.*
+
+# 生成物。creative_id から常に再生成できるのでコミットしない
+out/
+.work/
+.layout/
+
+# 素材はリポジトリに入れない。
+#  - 実素材は権利と容量の問題があるため（Drive などで受け渡す）
+#  - サンプル素材は `npm run sample-assets` で再生成できるため
+packages/generator/projects/*/assets/

@@ -1,0 +1,284 @@
+{
+  "id": "hook-price",
+  "name": "オファー訴求15秒（4カット）",
+  "version": "1.0.0",
+  "description": "冒頭3秒でオファーを言い切り、素材4カットで理由を見せ、CTAで締める型。スキッパブルインストリームの標準尺。",
+  "fps": 30,
+  "hookType": "${axis.hook}",
+
+  "axes": {
+    "hook": {
+      "description": "冒頭3秒の切り口。何で足を止めるか",
+      "values": ["price", "scarcity", "question"]
+    },
+    "textStyle": {
+      "description": "テロップの見せ方。強い縁取り vs 座布団",
+      "values": ["impact", "clean"]
+    },
+    "ctaTiming": {
+      "description": "CTAを中盤から常時出すか、最後だけ出すか",
+      "values": ["early", "late"]
+    }
+  },
+
+  "requiredCopy": [
+    "kicker",
+    "hook.price", "hook.scarcity", "hook.question",
+    "benefit1", "benefit2", "offer", "cta"
+  ],
+
+  "audio": { "volume": 0.18, "fadeIn": 0.5, "fadeOut": 1.2 },
+
+  "defs": {
+    "styles": {
+      "headline": {
+        "$switch": {
+          "on": "axis:textStyle",
+          "cases": {
+            "impact": {
+              "font": "bold",
+              "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 9.5, "square": 9.0 }, "default": 8.2 } },
+              "color": "${brand.accent}",
+              "strokeColor": "#141414",
+              "strokeWidthPct": 8,
+              "letterSpacingEm": 0.01,
+              "lineHeight": 1.24,
+              "align": "center",
+              "shadow": { "color": "rgba(0,0,0,0.55)", "blurEm": 0.18, "offsetYEm": 0.06 }
+            },
+            "clean": {
+              "font": "bold",
+              "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 8.6, "square": 8.2 }, "default": 7.4 } },
+              "color": "#FFFFFF",
+              "strokeWidthPct": 0,
+              "letterSpacingEm": 0.04,
+              "lineHeight": 1.34,
+              "align": "center",
+              "band": { "color": "rgba(18,18,18,0.74)", "paddingXEm": 0.55, "paddingYEm": 0.26, "radiusEm": 0.1, "perLine": true }
+            }
+          }
+        }
+      },
+
+      "sub": {
+        "$switch": {
+          "on": "axis:textStyle",
+          "cases": {
+            "impact": {
+              "font": "bold",
+              "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 6.4, "square": 6.6 }, "default": 6.0 } },
+              "color": "#FFFFFF",
+              "strokeColor": "#141414",
+              "strokeWidthPct": 7,
+              "letterSpacingEm": 0.02,
+              "lineHeight": 1.34,
+              "align": "center"
+            },
+            "clean": {
+              "font": "bold",
+              "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 6.0, "square": 6.2 }, "default": 5.6 } },
+              "color": "#FFFFFF",
+              "strokeWidthPct": 0,
+              "letterSpacingEm": 0.05,
+              "lineHeight": 1.4,
+              "align": "center",
+              "band": { "color": "rgba(18,18,18,0.66)", "paddingXEm": 0.5, "paddingYEm": 0.24, "radiusEm": 0.1, "perLine": true }
+            }
+          }
+        }
+      },
+
+      "kicker": {
+        "font": "bold",
+        "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.8, "square": 3.6 }, "default": 3.2 } },
+        "color": "${brand.textOnPrimary}",
+        "letterSpacingEm": 0.16,
+        "lineHeight": 1.2,
+        "align": "center",
+        "band": { "color": "${brand.primary}", "paddingXEm": 0.9, "paddingYEm": 0.34, "radiusEm": 0.16, "perLine": true }
+      },
+
+      "cta": {
+        "font": "bold",
+        "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 4.6, "square": 4.4 }, "default": 4.0 } },
+        "color": "${brand.textOnPrimary}",
+        "letterSpacingEm": 0.04,
+        "lineHeight": 1.3,
+        "align": "center",
+        "band": { "color": "${brand.primary}", "paddingXEm": 0.9, "paddingYEm": 0.36, "radiusEm": 0.18, "perLine": false }
+      }
+    },
+
+    "y": {
+      "headline": { "$switch": { "on": "orientation", "cases": { "landscape": -18, "square": -20 }, "default": -24 } },
+      "sub": { "$switch": { "on": "orientation", "cases": { "landscape": -26, "square": -28 }, "default": -38 } },
+      "kicker": { "$switch": { "on": "orientation", "cases": { "landscape": -62, "square": -56 }, "default": -50 } },
+      "cta": { "$switch": { "on": "orientation", "cases": { "landscape": -12, "square": -14 }, "default": -22 } }
+    },
+
+    "width": {
+      "$switch": { "on": "orientation", "cases": { "landscape": 64, "square": 78 }, "default": 82 }
+    },
+
+    "scrim": {
+      "kind": "scrim",
+      "side": "bottom",
+      "heightPct": 62,
+      "color": "#000000",
+      "strength": 0.66,
+      "anim": "none",
+      "start": 0
+    }
+  },
+
+  "scenes": [
+    {
+      "id": "hook",
+      "asset": "hero1",
+      "duration": 4.2,
+      "motion": "zoom-in",
+      "motionIntensity": 0.55,
+      "overlays": [
+        { "$ref": "defs.scrim" },
+        {
+          "kind": "text",
+          "role": "sub",
+          "id": "kicker",
+          "maxLines": 1,
+          "text": "${copy.kicker}",
+          "style": { "$ref": "defs.styles.kicker" },
+          "maxWidthPct": { "$ref": "defs.width" },
+          "anchor": "bottom-center",
+          "yPct": { "$ref": "defs.y.kicker" },
+          "start": 0.2,
+          "anim": "slide-up",
+          "animDuration": 0.32
+        },
+        {
+          "kind": "text",
+          "role": "headline",
+          "id": "headline",
+          "maxLines": 2,
+          "text": "${copy.hook.${axis.hook}}",
+          "style": { "$ref": "defs.styles.headline" },
+          "maxWidthPct": { "$ref": "defs.width" },
+          "anchor": "bottom-center",
+          "yPct": { "$ref": "defs.y.headline" },
+          "start": 0.38,
+          "anim": "slide-up",
+          "animDuration": 0.34
+        }
+      ]
+    },
+
+    {
+      "id": "benefit1",
+      "asset": "hero2",
+      "duration": 3.6,
+      "motion": "pan-right",
+      "motionIntensity": 0.4,
+      "transitionIn": "fade",
+      "transitionDuration": 0.4,
+      "overlays": [
+        { "$ref": "defs.scrim" },
+        {
+          "kind": "text",
+          "role": "sub",
+          "maxLines": 2,
+          "text": "${copy.benefit1}",
+          "style": { "$ref": "defs.styles.sub" },
+          "maxWidthPct": { "$ref": "defs.width" },
+          "anchor": "bottom-center",
+          "yPct": { "$ref": "defs.y.sub" },
+          "start": 0.25,
+          "anim": "slide-up",
+          "animDuration": 0.3
+        }
+      ]
+    },
+
+    {
+      "id": "benefit2",
+      "asset": "hero3",
+      "duration": 3.6,
+      "motion": "zoom-out",
+      "motionIntensity": 0.45,
+      "transitionIn": "fade",
+      "transitionDuration": 0.4,
+      "overlays": [
+        { "$ref": "defs.scrim" },
+        {
+          "kind": "text",
+          "role": "sub",
+          "maxLines": 2,
+          "text": "${copy.benefit2}",
+          "style": { "$ref": "defs.styles.sub" },
+          "maxWidthPct": { "$ref": "defs.width" },
+          "anchor": "bottom-center",
+          "yPct": { "$ref": "defs.y.sub" },
+          "start": 0.25,
+          "anim": "slide-up",
+          "animDuration": 0.3
+        }
+      ]
+    },
+
+    {
+      "id": "close",
+      "asset": "hero4",
+      "duration": 4.6,
+      "motion": "zoom-in",
+      "motionIntensity": 0.3,
+      "transitionIn": "fade",
+      "transitionDuration": 0.4,
+      "grade": { "brightness": -0.06, "contrast": 1.02, "saturation": 0.94, "blurPx": 0 },
+      "overlays": [
+        { "$ref": "defs.scrim", "heightPct": 100, "strength": 0.5, "side": "full" },
+        {
+          "kind": "text",
+          "role": "price",
+          "maxLines": 1,
+          "text": "${copy.offer}",
+          "style": { "$ref": "defs.styles.sub" },
+          "maxWidthPct": { "$ref": "defs.width" },
+          "anchor": "center",
+          "yPct": -6,
+          "start": 0.3,
+          "anim": "fade",
+          "animDuration": 0.3
+        }
+      ]
+    }
+  ],
+
+  "overlays": [
+    {
+      "kind": "image",
+      "role": "logo",
+      "file": "assets/logo.png",
+      "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 13, "square": 18 }, "default": 22 } },
+      "anchor": "top-left",
+      "xPct": { "$switch": { "on": "orientation", "cases": { "landscape": 6 }, "default": 8 } },
+      "yPct": { "$switch": { "on": "orientation", "cases": { "landscape": 7 }, "default": 9 } },
+      "start": 0.4,
+      "anim": "fade",
+      "animDuration": 0.5,
+      "opacity": 0.95
+    },
+    {
+      "kind": "text",
+      "role": "cta",
+      "id": "cta",
+      "maxLines": 1,
+      "text": "${copy.cta}",
+      "style": { "$ref": "defs.styles.cta" },
+      "maxWidthPct": { "$ref": "defs.width" },
+      "anchor": "bottom-center",
+      "yPct": { "$ref": "defs.y.cta" },
+      "start": { "$switch": { "on": "axis:ctaTiming", "cases": { "early": 7.6, "late": 11.4 } } },
+      "anim": "slide-up",
+      "animDuration": 0.36,
+      "outDuration": 0
+    }
+  ]
+}

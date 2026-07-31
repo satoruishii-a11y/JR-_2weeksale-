@@ -1,0 +1,30 @@
+{
+  "name": "@atarayo/creative-generator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "静止画からYouTube広告クリエイティブを複数パターン量産するレンダラー",
+  "type": "module",
+  "bin": {
+    "creative-gen": "./dist/cli.js"
+  },
+  "scripts": {
+    "gen": "tsx src/cli.ts",
+    "sample-assets": "tsx scripts/make-sample-assets.ts",
+    "demo": "npm run sample-assets && tsx src/cli.ts render --project projects/sample-jr-2weeksale --template hook-price --strategy orthogonal:6 --ratios 9x16,16x9,1x1",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.60",
+    "ffmpeg-static": "^5.2.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

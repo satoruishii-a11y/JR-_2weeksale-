@@ -1,0 +1,51 @@
+{
+  "slug": "sample-2wk",
+  "client": "サンプル鉄道（架空）",
+  "campaign": "2週間セール",
+  "legalNote": "これは仕組み検証用のダミー案件です。コピー・数値はすべて架空で、実在の事業者・商品とは関係ありません。実案件では必ず表記に関する社内チェックを通してください。",
+
+  "brand": {
+    "primary": "#0B5FA5",
+    "accent": "#FFD400",
+    "textOnPrimary": "#FFFFFF",
+    "logo": "assets/logo.png"
+  },
+
+  "fonts": {
+    "default": [
+      "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",
+      "/usr/share/fonts/opentype/ipafont-gothic/ipagp.ttf",
+      "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc",
+      "C:\\Windows\\Fonts\\YuGothB.ttc"
+    ],
+    "bold": [
+      "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",
+      "/usr/share/fonts/opentype/ipafont-gothic/ipagp.ttf",
+      "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc",
+      "C:\\Windows\\Fonts\\YuGothB.ttc"
+    ]
+  },
+
+  "assets": [
+    { "id": "hero1", "file": "assets/hero1.jpg", "role": "hero", "subject": "夜行列車の車窓" },
+    { "id": "hero2", "file": "assets/hero2.jpg", "role": "hero", "subject": "海沿いの路線" },
+    { "id": "hero3", "file": "assets/hero3.jpg", "role": "hero", "subject": "山間の紅葉" },
+    { "id": "hero4", "file": "assets/hero4.jpg", "role": "close", "subject": "駅ホームの朝" }
+  ],
+
+  "copy": {
+    "kicker": "2週間限定",
+    "hook": {
+      "price": "旅の交通費\nまるごと半額",
+      "scarcity": "この価格は\nあと2週間だけ",
+      "question": "その旅費、\n半分にできます"
+    },
+    "benefit1": "全国200区間が\n対象になりました",
+    "benefit2": "予約はスマホで\n90秒",
+    "offer": "8月14日 23:59まで",
+    "offerShort": "8/14 23:59まで",
+    "cta": "「2週間セール」で検索"
+  },
+
+  "bgm": "assets/bgm.mp3"
+}
