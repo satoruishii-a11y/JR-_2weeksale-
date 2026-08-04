@@ -136,11 +136,19 @@ async function main(): Promise<void> {
     console.log(`✓ template      ${template.name} (${template.id}@${template.version})`);
     let failed = false;
 
-    const missingAssets = project.assets.filter(
-      (a) => !existsSync(path.resolve(projectDir, a.file)),
-    );
+    // ${ratio} を含むパスは、実際に出す比率のぶんだけ確認する（--ratios で指定）
+    const checkRatios = parseRatios(flags['ratios']);
+    const missingAssets: string[] = [];
+    for (const asset of project.assets) {
+      const candidates = asset.file.includes('${ratio}')
+        ? checkRatios.map((r) => asset.file.replaceAll('${ratio}', r))
+        : [asset.file];
+      for (const candidate of candidates) {
+        if (!existsSync(path.resolve(projectDir, candidate))) missingAssets.push(candidate);
+      }
+    }
     if (missingAssets.length > 0) {
-      console.error(`✗ 見つからない素材: ${missingAssets.map((a) => a.file).join(', ')}`);
+      console.error(`✗ 見つからない素材: ${missingAssets.join(', ')}`);
       failed = true;
     } else {
       console.log(`✓ 素材ファイル ${project.assets.length} 点はすべて存在します`);

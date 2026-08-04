@@ -43,25 +43,25 @@
   "assets": [
     {
       "id": "hero1",
-      "file": "assets/koyo-approach.jpg",
+      "file": "assets/${ratio}/koyo-approach.jpg",
       "role": "hero",
       "subject": "紅葉の参道・順光"
     },
     {
       "id": "hero2",
-      "file": "assets/koyo-pagoda.jpg",
+      "file": "assets/${ratio}/koyo-pagoda.jpg",
       "role": "hero",
       "subject": "五重塔と夕景"
     },
     {
       "id": "hero3",
-      "file": "assets/koyo-river.jpg",
+      "file": "assets/${ratio}/koyo-river.jpg",
       "role": "hero",
       "subject": "渓谷と川・朝霧"
     },
     {
       "id": "hero4",
-      "file": "assets/koyo-alley.jpg",
+      "file": "assets/${ratio}/koyo-alley.jpg",
       "role": "close",
       "subject": "石畳の路地・夜の提灯"
     }

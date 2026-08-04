@@ -79,15 +79,27 @@ function formatZodError(issues: Array<{ path: (string | number)[]; message: stri
   return issues.map((i) => `  - ${i.path.join('.') || '(root)'}: ${i.message}`).join('\n');
 }
 
-/** シーンの asset id を実ファイルの絶対パスに解決する */
-function resolveSceneFiles(template: ResolvedTemplate, project: Project, projectDir: string): string[] {
+/**
+ * シーンの asset id を実ファイルの絶対パスに解決する。
+ *
+ * assets[].file には ${ratio} が書ける。1枚の素材を全比率で切り抜くと、
+ * 縦長の素材を 16:9 にした時に上下が半分以上落ちて構図が壊れるため、
+ * 面ごとに素材を用意できる逃げ道を残している。
+ */
+function resolveSceneFiles(
+  template: ResolvedTemplate,
+  project: Project,
+  projectDir: string,
+  ratio: RatioKey,
+): string[] {
   return template.scenes.map((scene, index) => {
     const asset = project.assets.find((a) => a.id === scene.asset);
     if (!asset) {
       const known = project.assets.map((a) => a.id).join(', ');
       throw new Error(`scenes[${index}].asset "${scene.asset}" が project.assets にありません（利用可能: ${known}）`);
     }
-    const abs = path.isAbsolute(asset.file) ? asset.file : path.resolve(projectDir, asset.file);
+    const file = asset.file.replaceAll('${ratio}', ratio);
+    const abs = path.isAbsolute(file) ? file : path.resolve(projectDir, file);
     if (!existsSync(abs)) throw new Error(`素材ファイルが見つかりません: ${abs}`);
     return abs;
   });
@@ -150,7 +162,7 @@ async function renderOne(
 
   // 2) 尺とレイヤーを確定
   const timeline = computeTimeline(template);
-  const sceneFiles = resolveSceneFiles(template, project, projectDir);
+  const sceneFiles = resolveSceneFiles(template, project, projectDir, ratio);
   const workDir = path.join(options.outDir, '.work', job.id);
   const { layers, warnings } = await buildLayers(
     template, timeline, target, ratio, fonts, projectDir, workDir,

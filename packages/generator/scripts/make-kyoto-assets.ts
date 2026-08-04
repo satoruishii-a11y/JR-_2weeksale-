@@ -16,8 +16,23 @@ import { runFfmpeg } from '../src/ffmpeg.js';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ASSET_DIR = path.resolve(HERE, '../projects/kyoto-koyo/assets');
 
-const W = 1800;
-const H = 2250;
+/**
+ * 出力サイズは面ごとに変える。
+ *
+ * 1枚の縦長素材を 16:9 に切ると上下が半分以上落ちて、参道の奥行きや
+ * 塔の全景といった「構図そのもの」が失われる。組版は面ごとに解決し直せても、
+ * 素材の構図は切り抜きでは作れない。手続き生成なら描き直せるので、
+ * 面ごとに専用の素材を出す。
+ * （実写の場合も、16:9 で撮って縦を切り出すより面ごとに抑えるのが本来の形）
+ */
+const TARGETS = [
+  { ratio: '16x9', width: 2400, height: 1350 },
+  { ratio: '9x16', width: 1560, height: 2772 },
+] as const;
+
+// 各シーン関数から参照する現在のキャンバス寸法
+let W: number = TARGETS[0].width;
+let H: number = TARGETS[0].height;
 
 /* ------------------------------------------------------------------ *
  * 乱数（毎回同じ絵が出るように固定シード）
@@ -628,16 +643,24 @@ const SCENES: Array<{ file: string; draw: (ctx: SKRSContext2D) => void }> = [
 ];
 
 async function main(): Promise<void> {
-  await mkdir(ASSET_DIR, { recursive: true });
   const family = registerFont();
 
-  for (const scene of SCENES) {
-    const canvas = createCanvas(W, H);
-    scene.draw(canvas.getContext('2d'));
-    await writeFile(path.join(ASSET_DIR, scene.file), canvas.toBuffer('image/jpeg', 86));
-    console.log(`  ${scene.file}`);
+  for (const target of TARGETS) {
+    W = target.width;
+    H = target.height;
+    const dir = path.join(ASSET_DIR, target.ratio);
+    await mkdir(dir, { recursive: true });
+
+    for (const scene of SCENES) {
+      const canvas = createCanvas(W, H);
+      scene.draw(canvas.getContext('2d'));
+      await writeFile(path.join(dir, scene.file), canvas.toBuffer('image/jpeg', 86));
+    }
+    console.log(`  ${target.ratio}  ${W}x${H}  ${SCENES.length} カット`);
   }
 
+  // ロゴは面に依存しないので共通で1枚
+  await mkdir(ASSET_DIR, { recursive: true });
   await makeLogo(family);
   try {
     await makeBgm();
