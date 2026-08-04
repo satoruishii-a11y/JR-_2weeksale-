@@ -11,6 +11,13 @@ out/
 .layout/
 
 # 素材はリポジトリに入れない。
-#  - 実素材は権利と容量の問題があるため（Drive などで受け渡す）
-#  - サンプル素材は `npm run sample-assets` で再生成できるため
-packages/generator/projects/*/assets/
+#  - 生成できるサンプル素材（`npm run sample-assets` / `kyoto-assets`）は追跡しない
+#  - 実素材は権利と容量の問題があるので、原則 Drive などで受け渡す
+#
+# ただし assets/photos/ だけは例外にしている。検証用の実写を数枚コミットして
+# 受け渡す経路が無いと、この環境に素材を持ち込めないため。
+# ディレクトリごと無視すると git が中に降りず否定パターンが効かないので、
+# 中身（assets/*）を無視して photos だけ戻している。
+packages/generator/projects/*/assets/*
+!packages/generator/projects/*/assets/photos/
+!packages/generator/projects/*/assets/photos/**
