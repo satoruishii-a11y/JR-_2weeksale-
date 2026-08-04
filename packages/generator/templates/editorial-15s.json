@@ -44,6 +44,7 @@
 
     "type": {
       "headlineTate": {
+        "breakStrategy": "phrase",
         "font": "mincho",
         "writingMode": "vertical",
         "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 7.4, "square": 6.8 }, "default": 6.4 } },
@@ -54,6 +55,7 @@
         "shadow": { "color": "rgba(12,8,6,0.5)", "blurEm": 0.3, "offsetXEm": 0, "offsetYEm": 0.04 }
       },
       "headlineYoko": {
+        "breakStrategy": "phrase",
         "font": "mincho",
         "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 7.6, "square": 6.4 }, "default": 5.4 } },
         "minSizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 5.4, "square": 4.6 }, "default": 3.9 } },
@@ -73,6 +75,7 @@
         "shadow": { "color": "rgba(12,8,6,0.6)", "blurEm": 0.4, "offsetXEm": 0, "offsetYEm": 0.05 }
       },
       "body": {
+        "breakStrategy": "phrase",
         "font": "gothic",
         "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 4.2, "square": 3.8 }, "default": 3.5 } },
         "minSizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.0, "square": 2.7 }, "default": 2.5 } },
@@ -83,6 +86,7 @@
         "shadow": { "color": "rgba(12,8,6,0.55)", "blurEm": 0.35, "offsetXEm": 0, "offsetYEm": 0.05 }
       },
       "bodyRight": {
+        "breakStrategy": "phrase",
         "font": "gothic",
         "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 4.2, "square": 3.8 }, "default": 3.5 } },
         "minSizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.0, "square": 2.7 }, "default": 2.5 } },
@@ -93,6 +97,7 @@
         "shadow": { "color": "rgba(12,8,6,0.55)", "blurEm": 0.35, "offsetXEm": 0, "offsetYEm": 0.05 }
       },
       "offer": {
+        "breakStrategy": "phrase",
         "font": "minchoMid",
         "sizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 5.0, "square": 4.6 }, "default": 4.2 } },
         "minSizePct": { "$switch": { "on": "orientation", "cases": { "landscape": 3.6, "square": 3.3 }, "default": 3.0 } },

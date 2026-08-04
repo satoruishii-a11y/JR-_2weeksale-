@@ -129,6 +129,14 @@ export const TextStyleSchema = z.object({
    * 和文の広告らしさが一番出る指定なので、大見出しに使う。
    */
   writingMode: z.enum(['horizontal', 'vertical']).default('horizontal'),
+  /**
+   * 折り返しの決め方。
+   *  kinsoku — 幅いっぱいまで詰めて、行頭・行末に置けない文字だけ調整する（既定）
+   *  phrase  — BudouX で文節の境界を出し、そこを優先して折り返す。
+   *            「京都の紅葉2日／間3万円台」のような語中での分断を防げるので、
+   *            コピーが毎月変わる見出し・本文はこちらが安全。
+   */
+  breakStrategy: z.enum(['kinsoku', 'phrase']).default('kinsoku'),
   /** テキスト背面の帯 */
   band: z
     .object({

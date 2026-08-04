@@ -3,6 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createCanvas, loadImage, GlobalFonts, type SKRSContext2D } from '@napi-rs/canvas';
+import { loadDefaultJapaneseParser } from 'budoux';
 import type {
   Anchor,
   BandOverlay,
@@ -189,6 +190,127 @@ function wrapLine(
   return lines;
 }
 
+/* ------------------------------------------------------------------ *
+ * 文節単位の改行（BudouX）
+ * ------------------------------------------------------------------ */
+
+let phraseParser: { parse(text: string): string[] } | null = null;
+
+/** BudouX のパーサは初期化に少しかかるので使い回す */
+function getPhraseParser(): { parse(text: string): string[] } {
+  phraseParser ??= loadDefaultJapaneseParser();
+  return phraseParser;
+}
+
+/**
+ * BudouX の文節境界を「改行してよい位置」の集合に変換する。
+ *
+ * BudouX の出力をそのまま行の単位として使うと 2 つの理由で破綻する。
+ *
+ * 1. 数字と助数詞を割ってしまう。
+ *    「京都の紅葉2日間3万円台から」→ ["京都の","紅葉2","日間3万円台から"] となり、
+ *    そのまま使うと「紅葉2／日間」で改行される。広告コピーには価格・日数・人数が
+ *    必ず入るので、この誤りは高い頻度で踏む。数字の直後は改行候補から外す。
+ * 2. 境界が左寄りにしかない場合、そこで折ると行が余って行数が増えることがある。
+ *    これは候補の取捨では判断できないので、呼び出し側（wrapBest）で
+ *    字詰めの結果と行数を比べて決める。
+ */
+function phraseBreakPoints(text: string, chars: string[]): Set<number> {
+  const points = new Set<number>();
+  let index = 0;
+  const chunks = getPhraseParser().parse(text);
+  for (let i = 0; i < chunks.length - 1; i++) {
+    index += Array.from(chunks[i]!).length;
+    points.add(index);
+  }
+  for (const point of [...points]) {
+    if (point > 0 && /[0-9０-９]/.test(chars[point - 1]!)) points.delete(point);
+  }
+  return points;
+}
+
+/**
+ * 文節の切れ目を優先して折り返す。
+ *
+ * 禁則処理は「この文字を行頭に置いてよいか」しか見ないので、
+ * 「広告効果を最大化す／る動画を」のような語中での分断は防げない。
+ * 意味の境界を BudouX で拾い、行が十分埋まる範囲で一番右の境界を選ぶ。
+ * 境界が使えないときは従来の字詰め＋禁則にそのまま落ちるので、
+ * 元の方式より悪くなることがない。
+ */
+function wrapByPhrase(
+  ctx: SKRSContext2D,
+  text: string,
+  maxWidth: number,
+  letterSpacing: number,
+): string[][] {
+  const chars = Array.from(text);
+  if (chars.length === 0) return [[]];
+
+  const points = phraseBreakPoints(text, chars);
+  const lines: string[][] = [];
+  let start = 0;
+
+  while (start < chars.length) {
+    // まず字詰めで入るところまでの終端を出す
+    let hardEnd = start + 1;
+    while (
+      hardEnd < chars.length &&
+      measureChars(ctx, chars.slice(start, hardEnd + 1), letterSpacing) <= maxWidth
+    ) {
+      hardEnd++;
+    }
+
+    if (hardEnd >= chars.length) {
+      lines.push(chars.slice(start));
+      break;
+    }
+
+    // その手前で一番右にある文節境界を探す
+    let end = -1;
+    for (let point = hardEnd; point > start; point--) {
+      if (points.has(point)) {
+        end = point;
+        break;
+      }
+    }
+
+    if (end < 0) {
+      end = hardEnd;
+      while (end < chars.length && NO_LINE_START.has(chars[end]!)) end++;
+      while (end - 1 > start && NO_LINE_END.has(chars[end - 1]!)) end--;
+      if (end <= start) end = start + 1;
+    }
+
+    lines.push(chars.slice(start, end));
+    start = end;
+  }
+
+  return lines;
+}
+
+/**
+ * 文節優先で組んだ結果と字詰めで組んだ結果を比べ、行数の少ない方を採る。
+ * 同数なら文節優先（語の途中で切れないほうが読める）。
+ *
+ * 文節境界が行の左寄りにしかないときは、そこで折ると行が余って
+ * 行数が増えることがある。それを埋まり具合の閾値で当てにいくと
+ * コピーごとに調整が必要になるので、両方組んで実際の行数で決める。
+ * 短い文字列なので二度組んでも負荷は無視できるし、
+ * この方式なら文節優先にして行数が増えることが原理的に起きない。
+ */
+function wrapBest(
+  ctx: SKRSContext2D,
+  paragraph: string,
+  chars: string[],
+  maxWidth: number,
+  letterSpacing: number,
+): string[][] {
+  const byPhrase = wrapByPhrase(ctx, paragraph, maxWidth, letterSpacing);
+  const byKinsoku = wrapLine(ctx, chars, maxWidth, letterSpacing);
+  return byPhrase.length <= byKinsoku.length ? byPhrase : byKinsoku;
+}
+
 function roundRect(ctx: SKRSContext2D, x: number, y: number, w: number, h: number, r: number): void {
   const radius = Math.max(0, Math.min(r, w / 2, h / 2));
   ctx.beginPath();
@@ -260,7 +382,10 @@ function layoutAt(
       lines.push([]);
       continue;
     }
-    const wrapped = wrapLine(probe, chars, textMaxWidth, letterSpacing);
+    const wrapped =
+      style.breakStrategy === 'phrase'
+        ? wrapBest(probe, para, chars, textMaxWidth, letterSpacing)
+        : wrapLine(probe, chars, textMaxWidth, letterSpacing);
     avoidOrphan(wrapped);
     lines.push(...wrapped);
   }
@@ -314,10 +439,8 @@ function layoutVerticalAt(
   const perColumn = Math.max(1, Math.floor(usableHeight / cellAdvance));
 
   const columns: string[][] = [];
-  for (const para of text.split('\n')) {
-    const cells = toVerticalCells(Array.from(para));
-    if (cells.length === 0) continue;
-    const start = columns.length;
+  /** 列頭・列末禁則を見ながら、枡目の数だけで列に割る */
+  const splitByCells = (cells: string[], into: string[][]): void => {
     for (let i = 0; i < cells.length; ) {
       let end = Math.min(i + perColumn, cells.length);
       if (end < cells.length) {
@@ -326,9 +449,61 @@ function layoutVerticalAt(
         while (end - 1 > i && NO_LINE_END.has(cells[end - 1]!)) end--;
         if (end <= i) end = i + 1;
       }
-      columns.push(cells.slice(i, end));
+      into.push(cells.slice(i, end));
       i = end;
     }
+  };
+
+  for (const para of text.split('\n')) {
+    const start = columns.length;
+
+    const cells = toVerticalCells(Array.from(para));
+    if (cells.length === 0) continue;
+
+    if (style.breakStrategy === 'phrase') {
+      // 縦組みは枡目が正方形なので、幅の実測ではなく枡目数だけで判定できる
+      const chunks = getPhraseParser().parse(para);
+      const phraseCells: string[] = [];
+      const points = new Set<number>();
+      chunks.forEach((chunk, i) => {
+        // 数字の直後は「2／日間」になるので改行候補にしない（横組みと同じ理由）
+        if (i > 0 && !/[0-9０-９]$/.test(chunks[i - 1]!)) points.add(phraseCells.length);
+        phraseCells.push(...toVerticalCells(Array.from(chunk)));
+      });
+      points.delete(0);
+
+      const byPhrase: string[][] = [];
+      let cursor = 0;
+      while (cursor < phraseCells.length) {
+        const hardEnd = Math.min(cursor + perColumn, phraseCells.length);
+        if (hardEnd >= phraseCells.length) {
+          byPhrase.push(phraseCells.slice(cursor));
+          break;
+        }
+        let end = -1;
+        for (let point = hardEnd; point > cursor; point--) {
+          if (points.has(point)) {
+            end = point;
+            break;
+          }
+        }
+        if (end < 0) {
+          end = hardEnd;
+          while (end < phraseCells.length && NO_LINE_START.has(phraseCells[end]!)) end++;
+          while (end - 1 > cursor && NO_LINE_END.has(phraseCells[end - 1]!)) end--;
+          if (end <= cursor) end = cursor + 1;
+        }
+        byPhrase.push(phraseCells.slice(cursor, end));
+        cursor = end;
+      }
+
+      const byKinsoku: string[][] = [];
+      splitByCells(cells, byKinsoku);
+      columns.push(...(byPhrase.length <= byKinsoku.length ? byPhrase : byKinsoku));
+    } else {
+      splitByCells(cells, columns);
+    }
+
     avoidOrphan(columns.slice(start));
   }
   if (columns.length === 0) columns.push([]);

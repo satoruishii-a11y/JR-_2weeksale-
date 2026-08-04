@@ -20,6 +20,7 @@
     "@expo-google-fonts/noto-sans-jp": "^0.4.3",
     "@expo-google-fonts/noto-serif-jp": "^0.4.3",
     "@napi-rs/canvas": "^0.1.60",
+    "budoux": "^0.8.4",
     "ffmpeg-static": "^5.2.0",
     "zod": "^3.23.8"
   },
