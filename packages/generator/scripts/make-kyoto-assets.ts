@@ -576,6 +576,118 @@ function sceneAlley(ctx: SKRSContext2D): void {
   grain(ctx, rand, 52000);
 }
 
+/** 05 丸窓から見る紅葉。室内の寄りカット */
+function sceneRoundWindow(ctx: SKRSContext2D): void {
+  const rand = mulberry32(5505);
+
+  // 室内。全体を暗く落として、窓の中だけが光る 状態 を作る
+  verticalGradient(ctx, [
+    [0, '#171210'],
+    [0.5, '#211A15'],
+    [0.66, '#2A211A'],
+    [1, '#3A2F24'],
+  ]);
+
+  const tatamiTop = H * 0.66;
+  const cx = W * (W > H ? 0.36 : 0.5);
+  // 円の下端が畳より上に収まるよう、中心と半径を面ごとに決める
+  const cy = H * (W > H ? 0.34 : 0.3);
+  const radius = Math.min(W, H) * 0.28;
+
+  // 障子。右手に格子と、その奥からの淡い光
+  if (W > H) {
+    const shojiX = W * 0.72;
+    ctx.fillStyle = 'rgba(196,176,140,0.16)';
+    ctx.fillRect(shojiX, H * 0.08, W - shojiX, tatamiTop - H * 0.08);
+    ctx.strokeStyle = 'rgba(30,22,18,0.85)';
+    ctx.lineWidth = Math.max(2, W * 0.0035);
+    for (let i = 0; i <= 5; i++) {
+      const x = shojiX + ((W - shojiX) / 5) * i;
+      ctx.beginPath();
+      ctx.moveTo(x, H * 0.08);
+      ctx.lineTo(x, tatamiTop);
+      ctx.stroke();
+    }
+    for (let i = 0; i <= 7; i++) {
+      const y = H * 0.08 + ((tatamiTop - H * 0.08) / 7) * i;
+      ctx.beginPath();
+      ctx.moveTo(shojiX, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+  }
+
+  // 窓の中の紅葉。円でクリップしてから描く
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.clip();
+
+  const sky = ctx.createLinearGradient(0, cy - radius, 0, cy + radius);
+  sky.addColorStop(0, '#C9762A');
+  sky.addColorStop(0.45, '#E0983C');
+  sky.addColorStop(1, '#6E4A22');
+  ctx.fillStyle = sky;
+  ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+
+  // 幹を数本入れて庭の奥行きを作る
+  ctx.fillStyle = 'rgba(58,34,24,0.7)';
+  for (let i = 0; i < 4; i++) {
+    const x = cx - radius + radius * 0.5 * i + rand() * radius * 0.2;
+    ctx.fillRect(x, cy - radius, radius * 0.06, radius * 2);
+  }
+
+  for (let i = 0; i < 420; i++) {
+    const angle = rand() * Math.PI * 2;
+    const dist = Math.sqrt(rand()) * radius;
+    ctx.globalAlpha = 0.55 + rand() * 0.45;
+    mapleLeaf(
+      ctx,
+      cx + Math.cos(angle) * dist,
+      cy + Math.sin(angle) * dist,
+      radius * (0.05 + rand() * 0.09),
+      rand() * 6,
+      AUTUMN[Math.floor(rand() * AUTUMN.length)]!,
+    );
+  }
+  ctx.restore();
+
+  // 窓枠
+  ctx.strokeStyle = '#100B09';
+  ctx.lineWidth = Math.max(6, radius * 0.075);
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // 畳。目の細かい横線と縁
+  ctx.fillStyle = '#4A3B2B';
+  ctx.fillRect(0, tatamiTop, W, H - tatamiTop);
+  ctx.strokeStyle = 'rgba(24,18,14,0.35)';
+  ctx.lineWidth = 1;
+  for (let y = tatamiTop; y < H; y += Math.max(4, H * 0.006)) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+  ctx.strokeStyle = 'rgba(18,13,10,0.8)';
+  ctx.lineWidth = Math.max(3, W * 0.004);
+  ctx.beginPath();
+  ctx.moveTo(0, tatamiTop);
+  ctx.lineTo(W, tatamiTop);
+  ctx.stroke();
+
+  // 窓から畳に落ちる光
+  const spill = ctx.createRadialGradient(cx, tatamiTop + (H - tatamiTop) * 0.35, 0, cx, tatamiTop + (H - tatamiTop) * 0.35, radius * 1.5);
+  spill.addColorStop(0, 'rgba(232,168,92,0.24)');
+  spill.addColorStop(1, 'rgba(232,168,92,0)');
+  ctx.fillStyle = spill;
+  ctx.fillRect(0, tatamiTop, W, H - tatamiTop);
+
+  vignette(ctx, 0.46, 0.3);
+  grain(ctx, rand, 46000);
+}
+
 /* ------------------------------------------------------------------ *
  * ロゴ / BGM
  * ------------------------------------------------------------------ */
@@ -626,6 +738,7 @@ const SCENES: Array<{ file: string; draw: (ctx: SKRSContext2D) => void }> = [
   { file: 'koyo-pagoda.jpg', draw: scenePagoda },
   { file: 'koyo-river.jpg', draw: sceneRiver },
   { file: 'koyo-alley.jpg', draw: sceneAlley },
+  { file: 'koyo-window.jpg', draw: sceneRoundWindow },
 ];
 
 async function main(): Promise<void> {

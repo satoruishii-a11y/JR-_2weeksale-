@@ -42,6 +42,36 @@
   },
   "assets": [
     {
+      "id": "cutHook",
+      "file": "assets/${ratio}/koyo-approach.jpg",
+      "role": "hero",
+      "subject": "紅葉の参道・順光の引き"
+    },
+    {
+      "id": "cutWide",
+      "file": "assets/${ratio}/koyo-pagoda.jpg",
+      "role": "hero",
+      "subject": "五重塔と夕景の引き"
+    },
+    {
+      "id": "cutMid",
+      "file": "assets/${ratio}/koyo-river.jpg",
+      "role": "hero",
+      "subject": "渓谷と橋・朝霧の中景"
+    },
+    {
+      "id": "cutDetail",
+      "file": "assets/${ratio}/koyo-window.jpg",
+      "role": "detail",
+      "subject": "丸窓から見る紅葉・室内の寄り"
+    },
+    {
+      "id": "cutClose",
+      "file": "assets/${ratio}/koyo-alley.jpg",
+      "role": "close",
+      "subject": "石畳の路地・夜の提灯"
+    },
+    {
       "id": "hero1",
       "file": "assets/${ratio}/koyo-approach.jpg",
       "role": "hero",
@@ -64,36 +94,6 @@
       "file": "assets/${ratio}/koyo-alley.jpg",
       "role": "close",
       "subject": "石畳の路地・夜の提灯"
-    },
-    {
-      "id": "photoNight",
-      "file": "assets/photos/toji-night.jpg",
-      "role": "hero",
-      "subject": "五重塔の夜間ライトアップ・池の反射"
-    },
-    {
-      "id": "photoWide",
-      "file": "assets/photos/kiyomizu-day.jpg",
-      "role": "hero",
-      "subject": "舞台造の伽藍と紅葉・曇天の引き"
-    },
-    {
-      "id": "photoMid",
-      "file": "assets/photos/bridge-tunnel.jpg",
-      "role": "hero",
-      "subject": "朱塗りの橋と紅葉のトンネル・順光"
-    },
-    {
-      "id": "photoDetail",
-      "file": "assets/photos/round-window.jpg",
-      "role": "detail",
-      "subject": "丸窓から見る紅葉・室内の寄り"
-    },
-    {
-      "id": "photoClose",
-      "file": "assets/photos/reflection-room.jpg",
-      "role": "close",
-      "subject": "書院の映り込み・暗い室内"
     }
   ],
   "copy": {

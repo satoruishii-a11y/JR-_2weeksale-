@@ -163,7 +163,7 @@
   "scenes": [
     {
       "id": "hook",
-      "asset": "photoNight",
+      "asset": "cutHook",
       "duration": { "$beats": 5 },
       "motion": "zoom-in",
       "motionIntensity": 0.6,
@@ -282,7 +282,7 @@
 
     {
       "id": "wide",
-      "asset": "photoWide",
+      "asset": "cutWide",
       "duration": { "$beats": 4 },
       "motion": "pan-right",
       "motionIntensity": 0.35,
@@ -318,7 +318,7 @@
 
     {
       "id": "mid",
-      "asset": "photoMid",
+      "asset": "cutMid",
       "duration": { "$beats": 3 },
       "motion": "zoom-out",
       "motionIntensity": 0.55,
@@ -331,7 +331,7 @@
 
     {
       "id": "detail",
-      "asset": "photoDetail",
+      "asset": "cutDetail",
       "duration": { "$beats": 4 },
       "motion": "zoom-in",
       "motionIntensity": 0.28,
@@ -367,7 +367,7 @@
 
     {
       "id": "close",
-      "asset": "photoClose",
+      "asset": "cutClose",
       "duration": { "$beats": 6 },
       "motion": "zoom-in",
       "motionIntensity": 0.22,
