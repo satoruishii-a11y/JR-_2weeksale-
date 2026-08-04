@@ -46,7 +46,7 @@ creative-gen templates                                                 テンプ
 |---|---|---|
 | `--out <dir>` | `<project>/out` | 出力先 |
 | `--strategy <spec>` | `orthogonal:6` | `orthogonal:N` / `sample:N` / `grid[:N]` |
-| `--ratios <list>` | `9x16` | `9x16,16x9,1x1,4x5` のカンマ区切り |
+| `--ratios <list>` | `16x9` | `16x9,9x16,1x1,4x5` のカンマ区切り。既定はインストリーム |
 | `--seed <string>` | テンプレートID | パターン選択の種。同じ種なら常に同じ組み合わせ |
 | `--safe-area <name>` | `instream` | `instream` / `shorts` |
 | `--preset <name>` | `medium` | x264 プリセット。下書きは `veryfast` |
@@ -67,11 +67,11 @@ npx tsx src/cli.ts plan --project projects/sample-2weeksale --template hook-pric
 
 # 3) 組版チェック（ffmpeg を回さない。ここでコピーを詰める）
 npx tsx src/cli.ts layout --project projects/sample-2weeksale --template hook-price \
-  --strategy orthogonal:6 --ratios 9x16,16x9,1x1
+  --strategy orthogonal:6 --ratios 16x9,9x16
 
 # 4) 本番書き出し
 npx tsx src/cli.ts render --project projects/sample-2weeksale --template hook-price \
-  --strategy orthogonal:6 --ratios 9x16,16x9,1x1 --contact-sheet
+  --strategy orthogonal:6 --ratios 16x9,9x16 --contact-sheet
 ```
 
 **3 を飛ばさないこと。** コピーが長すぎる／テロップがUIに隠れる、を描画前に潰せます。

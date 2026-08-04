@@ -52,11 +52,11 @@ packages/generator/projects/kyoto-koyo/out/index.html
 ```bash
 # 組版チェックのみ（ffmpeg を回さないので数秒）
 npx tsx src/cli.ts layout --project projects/sample-2weeksale --template hook-price \
-  --strategy grid --ratios 9x16,16x9,1x1
+  --strategy grid --ratios 16x9,9x16
 
 # 1本だけ描画
 npx tsx src/cli.ts render --project projects/sample-2weeksale --template bumper-6s \
-  --strategy sample:1 --ratios 9x16 --preset veryfast
+  --strategy sample:1 --ratios 16x9 --preset veryfast
 ```
 
 ---

@@ -45,7 +45,9 @@ function resolveTemplatePath(value: string): string {
 }
 
 function parseRatios(value: string | undefined): RatioKey[] {
-  if (!value) return ['9x16'];
+  // YouTube広告の主戦場はインストリーム（16:9）。9x16 は Shorts 面向けの追加なので、
+  // 何も指定しなければ 16x9 を出す
+  if (!value) return ['16x9'];
   const parts = value.split(',').map((s) => s.trim()).filter(Boolean);
   for (const part of parts) {
     if (!(RATIOS as readonly string[]).includes(part)) {
@@ -69,7 +71,7 @@ options:
   --out <dir>           出力先（既定: <project>/out）
   --strategy <spec>     orthogonal:N | sample:N | grid[:N]（既定: orthogonal:6）
                         orthogonal は各軸の値が均等に出るよう選ぶ。分析で要素を切り分けたいならこれ
-  --ratios <list>       9x16,16x9,1x1,4x5 のカンマ区切り（既定: 9x16）
+  --ratios <list>       16x9,9x16,1x1,4x5 のカンマ区切り（既定: 16x9＝インストリーム）
   --seed <string>       バリアント選択の乱数種。同じ種なら常に同じ組み合わせ
   --safe-area <name>    テキストのはみ出し判定に使う配信面（${SAFE_AREA_PROFILE_NAMES.join(' / ')}、既定: instream）
   --preset <name>       x264 プリセット（既定: medium。下書きは veryfast が速い）
@@ -80,8 +82,14 @@ options:
   --dry-run             描画せず生成予定の一覧だけ出す
 
 例:
-  creative-gen render --project projects/sample-jr-2weeksale --template hook-price \\
-    --strategy orthogonal:6 --ratios 9x16,16x9,1x1
+  # インストリーム（16:9）を6パターン。YouTube広告の主戦場はここ
+  creative-gen render --project projects/kyoto-koyo --template editorial-15s \\
+    --strategy orthogonal:6
+
+  # Shorts 面にも出すなら 9x16 を足し、判定を shorts に切り替える
+  # （右のアクションバーぶん中央寄せの使用可能幅が狭くなるので、コピーの短縮が必要）
+  creative-gen render --project projects/kyoto-koyo --template editorial-15s \\
+    --strategy orthogonal:6 --ratios 16x9,9x16 --safe-area shorts
 `;
 
 async function main(): Promise<void> {

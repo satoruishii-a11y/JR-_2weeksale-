@@ -10,11 +10,11 @@
   "scripts": {
     "gen": "tsx src/cli.ts",
     "sample-assets": "tsx scripts/make-sample-assets.ts",
-    "demo": "npm run sample-assets && tsx src/cli.ts render --project projects/sample-2weeksale --template hook-price --strategy orthogonal:6 --ratios 9x16,16x9,1x1",
+    "demo": "npm run sample-assets && tsx src/cli.ts render --project projects/sample-2weeksale --template hook-price --strategy orthogonal:6 --ratios 16x9,9x16",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "kyoto-assets": "tsx scripts/make-kyoto-assets.ts",
-    "demo-kyoto": "npm run kyoto-assets && tsx src/cli.ts render --project projects/kyoto-koyo --template hook-price --strategy orthogonal:5 --ratios 9x16,16x9 --contact-sheet"
+    "demo-kyoto": "npm run kyoto-assets && tsx src/cli.ts render --project projects/kyoto-koyo --template editorial-15s --strategy orthogonal:5 --ratios 16x9,9x16 --contact-sheet"
   },
   "dependencies": {
     "@expo-google-fonts/noto-sans-jp": "^0.4.3",
