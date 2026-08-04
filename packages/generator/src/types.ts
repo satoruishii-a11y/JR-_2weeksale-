@@ -283,6 +283,11 @@ export const ResolvedTemplateSchema = z.object({
        * YouTube は概ね -14 LUFS に正規化するため、音楽のみの広告は -16 前後が無難。
        */
       targetLufs: z.number().min(-40).max(-6).optional(),
+      /**
+       * BGM のテンポ。指定すると scenes[].duration に {"$beats": 4} と書けるようになり、
+       * カットの切り替わりが曲の拍に乗る。拍と無関係に切ると編集が締まらない。
+       */
+      bpm: z.number().min(40).max(240).optional(),
       volume: z.number().min(0).max(2).default(0.22),
       fadeIn: z.number().min(0).default(0.6),
       fadeOut: z.number().min(0).default(1.0),

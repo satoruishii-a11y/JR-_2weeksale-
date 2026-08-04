@@ -64,6 +64,36 @@
       "file": "assets/${ratio}/koyo-alley.jpg",
       "role": "close",
       "subject": "石畳の路地・夜の提灯"
+    },
+    {
+      "id": "photoNight",
+      "file": "assets/photos/toji-night.jpg",
+      "role": "hero",
+      "subject": "五重塔の夜間ライトアップ・池の反射"
+    },
+    {
+      "id": "photoWide",
+      "file": "assets/photos/kiyomizu-day.jpg",
+      "role": "hero",
+      "subject": "舞台造の伽藍と紅葉・曇天の引き"
+    },
+    {
+      "id": "photoMid",
+      "file": "assets/photos/bridge-tunnel.jpg",
+      "role": "hero",
+      "subject": "朱塗りの橋と紅葉のトンネル・順光"
+    },
+    {
+      "id": "photoDetail",
+      "file": "assets/photos/round-window.jpg",
+      "role": "detail",
+      "subject": "丸窓から見る紅葉・室内の寄り"
+    },
+    {
+      "id": "photoClose",
+      "file": "assets/photos/reflection-room.jpg",
+      "role": "close",
+      "subject": "書院の映り込み・暗い室内"
     }
   ],
   "copy": {
@@ -77,7 +107,8 @@
     "benefit2": "嵐山・渡月橋まで\n徒歩10分の宿",
     "offer": "11月30日出発分まで",
     "offerShort": "11/30出発分まで",
-    "cta": "「京あかり旅」で検索"
+    "cta": "「京あかり旅」で検索",
+    "benefitQuiet": "朝いちばんの\n静かな庭へ"
   },
   "bgm": "assets/bgm.mp3"
 }

@@ -154,6 +154,23 @@ function resolveSwitch(
   return resolveNode(branch, ctx, `${path}.$switch(${key})`, depth);
 }
 
+/**
+ * { "$beats": 4 } を秒に直す。テンポは root.audio.bpm から取る。
+ *
+ * カットの尺を秒で直接書くと、BGM の拍とずれて切り替わりが締まらない。
+ * 拍数で書けるようにしておくと、テンポを変えても全カットが追従する。
+ */
+function resolveBeats(spec: unknown, ctx: ResolveContext, path: string): number {
+  if (typeof spec !== 'number' || !Number.isFinite(spec) || spec <= 0) {
+    throw new ResolveError('$beats には正の数値が必要です', path);
+  }
+  const bpm = getPath(ctx.root, 'audio.bpm');
+  if (typeof bpm !== 'number') {
+    throw new ResolveError('$beats を使うにはテンプレートに audio.bpm が必要です', path);
+  }
+  return Number(((spec * 60) / bpm).toFixed(4));
+}
+
 const MAX_REF_DEPTH = 12;
 
 /**
@@ -210,6 +227,8 @@ export function resolveNode(node: unknown, ctx: ResolveContext, path = '$', dept
   const obj = node as Record<string, unknown>;
 
   if ('$ref' in obj) return resolveRef(obj, ctx, path, depth);
+
+  if ('$beats' in obj) return resolveBeats(obj['$beats'], ctx, path);
 
   if ('$switch' in obj) {
     const spec = obj['$switch'];

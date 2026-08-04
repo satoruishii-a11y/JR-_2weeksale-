@@ -374,3 +374,37 @@ Shorts に出す場合は縦の `defs.width` を 64 前後まで狭め、CTAの 
 ```bash
 npm run typecheck   # tsc --noEmit
 ```
+
+---
+
+## 実写素材を使う（editorial-5cut）
+
+`editorial-5cut` は実写5枚を「引き→引き→中景→寄り→クローズ」で組む型です。
+4カット版（`editorial-15s`）が全部引きの風景で単調だったため、
+**寄り（ディテール）のカットを入れて緩急を付け、カット尺を BGM の拍に乗せて**います。
+
+```
+BPM 80（1拍 0.75秒）
+  cut1 hook    5拍 3.75s  フック。見出し＋キッカー
+  cut2 wide    4拍 3.00s  引き。左上に小見出し
+  cut3 mid     3拍 2.25s  中景。テロップを置かず絵だけ見せる
+  cut4 detail  4拍 3.00s  寄り。右下に小見出し
+  cut5 close   6拍 4.50s  中央ロックアップ＋CTA帯
+繋ぎはすべて半拍（0.375s）→ 完成尺ちょうど 15.0 秒
+```
+
+拍で書けるのは `audio.bpm` と `$beats` があるからです。
+
+```jsonc
+"audio": { "bpm": 80, "targetLufs": -16 },
+"scenes": [
+  { "duration": { "$beats": 5 }, "transitionDuration": { "$beats": 0.5 } }
+]
+```
+
+テンポを変えれば全カットが追従します。秒で直接書くと拍とずれて編集が締まりません。
+
+**中景カットにテロップを置いていないのは意図的です。** 15秒のうち2.25秒だけ文字を消すと
+息をつく間ができて、前後のテロップが立ちます。
+
+素材の置き場とファイル名は `projects/kyoto-koyo/assets/photos/README.md` を見てください。
