@@ -589,33 +589,16 @@ function sceneRoundWindow(ctx: SKRSContext2D): void {
   ]);
 
   const tatamiTop = H * 0.66;
-  const cx = W * (W > H ? 0.36 : 0.5);
+  // 窓を右三分割に置き、左半分を無地の壁にしてテロップの居場所を作る。
+  // 障子の格子の上に文字を乗せると背景が忙しく、読めなくなる。
+  const cx = W * (W > H ? 0.63 : 0.54);
   // 円の下端が畳より上に収まるよう、中心と半径を面ごとに決める
-  const cy = H * (W > H ? 0.34 : 0.3);
-  const radius = Math.min(W, H) * 0.28;
+  const cy = H * (W > H ? 0.33 : 0.29);
+  const radius = Math.min(W, H) * (W > H ? 0.32 : 0.3);
 
-  // 障子。右手に格子と、その奥からの淡い光
-  if (W > H) {
-    const shojiX = W * 0.72;
-    ctx.fillStyle = 'rgba(196,176,140,0.16)';
-    ctx.fillRect(shojiX, H * 0.08, W - shojiX, tatamiTop - H * 0.08);
-    ctx.strokeStyle = 'rgba(30,22,18,0.85)';
-    ctx.lineWidth = Math.max(2, W * 0.0035);
-    for (let i = 0; i <= 5; i++) {
-      const x = shojiX + ((W - shojiX) / 5) * i;
-      ctx.beginPath();
-      ctx.moveTo(x, H * 0.08);
-      ctx.lineTo(x, tatamiTop);
-      ctx.stroke();
-    }
-    for (let i = 0; i <= 7; i++) {
-      const y = H * 0.08 + ((tatamiTop - H * 0.08) / 7) * i;
-      ctx.beginPath();
-      ctx.moveTo(shojiX, y);
-      ctx.lineTo(W, y);
-      ctx.stroke();
-    }
-  }
+  // 柱を一本。無地の壁だけだと平坦なので、構造の手がかりを置く
+  ctx.fillStyle = 'rgba(14,10,8,0.55)';
+  ctx.fillRect(W * (W > H ? 0.2 : 0.13), 0, Math.max(6, W * 0.012), tatamiTop);
 
   // 窓の中の紅葉。円でクリップしてから描く
   ctx.save();
