@@ -219,8 +219,11 @@ export const ScrimOverlaySchema = z.object({
   ...OverlayBase,
   kind: z.literal('scrim'),
   /** テキスト可読性のためのグラデーション */
-  side: z.enum(['bottom', 'top', 'full']).default('bottom'),
+  side: z.enum(['bottom', 'top', 'left', 'right', 'full']).default('bottom'),
+  /** bottom / top での高さ。left / right では使わない */
   heightPct: z.number().positive().default(45),
+  /** left / right での幅。縦書きテロップを片側の柱に載せるときに使う */
+  widthPct: z.number().positive().default(45),
   color: z.string().default('#000000'),
   strength: z.number().min(0).max(1).default(0.65),
 });

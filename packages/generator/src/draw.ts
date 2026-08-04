@@ -750,9 +750,14 @@ function withAlpha(hexColor: string, alpha: number): string {
 }
 
 export function renderScrim(overlay: ScrimOverlay, target: RenderTarget): Bitmap {
-  const width = target.width;
+  const horizontal = overlay.side === 'left' || overlay.side === 'right';
+  const width = horizontal
+    ? Math.round((target.width * overlay.widthPct) / 100)
+    : target.width;
   const height =
-    overlay.side === 'full' ? target.height : Math.round((target.height * overlay.heightPct) / 100);
+    overlay.side === 'full' || horizontal
+      ? target.height
+      : Math.round((target.height * overlay.heightPct) / 100);
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
@@ -760,11 +765,14 @@ export function renderScrim(overlay: ScrimOverlay, target: RenderTarget): Bitmap
     ctx.fillStyle = withAlpha(overlay.color, overlay.strength);
     ctx.fillRect(0, 0, width, height);
   } else {
-    const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    const [from, to] =
-      overlay.side === 'bottom'
-        ? [withAlpha(overlay.color, 0), withAlpha(overlay.color, overlay.strength)]
-        : [withAlpha(overlay.color, overlay.strength), withAlpha(overlay.color, 0)];
+    // 濃い端から透明な端へ。bottom / right は画面の端側が濃くなる
+    const gradient = horizontal
+      ? ctx.createLinearGradient(0, 0, width, 0)
+      : ctx.createLinearGradient(0, 0, 0, height);
+    const opaqueFirst = overlay.side === 'top' || overlay.side === 'left';
+    const [from, to] = opaqueFirst
+      ? [withAlpha(overlay.color, overlay.strength), withAlpha(overlay.color, 0)]
+      : [withAlpha(overlay.color, 0), withAlpha(overlay.color, overlay.strength)];
     gradient.addColorStop(0, from);
     gradient.addColorStop(1, to);
     ctx.fillStyle = gradient;
@@ -830,8 +838,9 @@ export function placeOverlay(
   target: RenderTarget,
 ): { x: number; y: number } {
   if (overlay.kind === 'scrim') {
+    const x = overlay.side === 'right' ? target.width - bitmap.width : 0;
     const y = overlay.side === 'bottom' ? target.height - bitmap.height : 0;
-    return { x: 0, y };
+    return { x, y };
   }
   return place(overlay.anchor, overlay.xPct, overlay.yPct, bitmap.width, bitmap.height, target);
 }

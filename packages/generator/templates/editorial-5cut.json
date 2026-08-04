@@ -149,6 +149,15 @@
       "anim": "none",
       "start": 0
     },
+    "scrimLeft": {
+      "kind": "scrim",
+      "side": "left",
+      "widthPct": { "$switch": { "on": "orientation", "cases": { "landscape": 46 }, "default": 62 } },
+      "color": "#0E0B08",
+      "strength": 0.72,
+      "anim": "none",
+      "start": 0
+    },
     "scrimTop": {
       "kind": "scrim",
       "side": "top",
@@ -174,7 +183,7 @@
           "$switch": {
             "on": "axis:typeStyle",
             "cases": {
-              "tate": { "$ref": "defs.scrimTop", "heightPct": 62, "strength": 0.7 },
+              "tate": { "$ref": "defs.scrimLeft" },
               "yoko": { "$ref": "defs.scrimBottom" }
             }
           }
@@ -340,7 +349,7 @@
       "transitionDuration": { "$ref": "defs.beat.half" },
       "grade": { "$ref": "defs.grade" },
       "overlays": [
-        { "$ref": "defs.scrimBottom", "heightPct": 48, "strength": 0.7 },
+        { "$ref": "defs.scrimBottom", "heightPct": 42, "strength": 0.44 },
         {
           "$ref": "defs.rule.horizontal",
           "anchor": "bottom-left",
