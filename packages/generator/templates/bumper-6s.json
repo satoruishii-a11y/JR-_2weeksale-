@@ -22,7 +22,7 @@
     "offerShort", "cta"
   ],
 
-  "audio": { "volume": 0.2, "fadeIn": 0.3, "fadeOut": 0.8 },
+  "audio": { "targetLufs": -16, "volume": 0.2, "fadeIn": 0.3, "fadeOut": 0.8 },
 
   "defs": {
     "headline": {

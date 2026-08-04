@@ -12,6 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createCanvas, GlobalFonts, type SKRSContext2D } from '@napi-rs/canvas';
 import { runFfmpeg } from '../src/ffmpeg.js';
+import { writeBgmMp3 } from './make-bgm.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ASSET_DIR = path.resolve(HERE, '../projects/kyoto-koyo/assets');
@@ -615,22 +616,7 @@ async function makeLogo(family: string): Promise<void> {
 
 /** 和風の五音音階を想定した仮BGM */
 async function makeBgm(): Promise<void> {
-  await runFfmpeg([
-    '-y', '-hide_banner', '-loglevel', 'error',
-    '-f', 'lavfi', '-i', 'sine=frequency=196:duration=24',      // G3
-    '-f', 'lavfi', '-i', 'sine=frequency=293.66:duration=24',   // D4
-    '-f', 'lavfi', '-i', 'sine=frequency=392:duration=24',      // G4
-    '-f', 'lavfi', '-i', 'sine=frequency=440:duration=24',      // A4
-    '-f', 'lavfi', '-i', 'sine=frequency=587.33:duration=24',   // D5
-    '-filter_complex',
-    '[0]volume=0.9[a0];[1]volume=0.6[a1];[2]volume=0.45[a2];[3]volume=0.3[a3];[4]volume=0.22[a4];' +
-      '[a0][a1][a2][a3][a4]amix=inputs=5:duration=longest,' +
-      'lowpass=f=1400,tremolo=f=0.3:d=0.4,volume=0.75,' +
-      'afade=t=in:st=0:d=1.8,afade=t=out:st=21.5:d=2.5[a]',
-    '-map', '[a]',
-    '-c:a', 'libmp3lame', '-b:a', '96k', '-ac', '2', '-ar', '48000',
-    path.join(ASSET_DIR, 'bgm.mp3'),
-  ]);
+  await writeBgmMp3(path.join(ASSET_DIR, 'bgm.mp3'));
 }
 
 /* ------------------------------------------------------------------ */

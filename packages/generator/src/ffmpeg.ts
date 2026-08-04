@@ -23,6 +23,22 @@ function n(value: number): string {
  */
 const MOTION_SUPERSAMPLE = 1.6;
 
+/**
+ * 0→1 の進捗に加減速を掛ける。
+ * 等速のズームは「機械が動かしている」ように見えるので、
+ * 寄り始めを速く・終わりを緩やかにすると手で撮ったカメラに近づく。
+ */
+function ease(progress: string, kind: Scene['motionEase']): string {
+  switch (kind) {
+    case 'ease-out':
+      return `(1-pow(1-(${progress}),3))`;
+    case 'ease-in-out':
+      return `(if(lt(${progress},0.5),4*pow(${progress},3),1-pow(2-2*(${progress}),3)/2))`;
+    default:
+      return `(${progress})`;
+  }
+}
+
 function motionChain(scene: Scene, target: RenderTarget): { pre: string; motion: string } {
   const { width, height, fps } = target;
 
@@ -48,7 +64,7 @@ function motionChain(scene: Scene, target: RenderTarget): { pre: string; motion:
 
   const centerX = `iw/2-(iw/zoom/2)`;
   const centerY = `ih/2-(ih/zoom/2)`;
-  const progress = `on/${n(last)}`;
+  const progress = ease(`on/${n(last)}`, scene.motionEase);
 
   let z: string;
   let x: string;
@@ -104,10 +120,14 @@ function gradeChain(scene: Scene): string[] {
   return filters;
 }
 
-/** 0→1 に張り付くクランプ済み進捗。スライドインの補間に使う */
+/**
+ * 0→1 に張り付くクランプ済み進捗。スライドインの補間に使う。
+ * こちらも ease-out にしないと、文字が一定速度で滑ってきて硬く見える。
+ */
 function clampedProgress(start: number, duration: number): string {
   if (duration <= 0) return '1';
-  return `min(max((t-${n(start)})/${n(duration)},0),1)`;
+  const linear = `min(max((t-${n(start)})/${n(duration)},0),1)`;
+  return `(1-pow(1-${linear},3))`;
 }
 
 function overlayPosition(layer: Layer, target: RenderTarget): { x: string; y: string } {
@@ -137,9 +157,56 @@ export interface BuildArgsInput {
   layers: Layer[];
   bgmFile?: string;
   outFile: string;
+  /**
+   * BGM に掛ける静的ゲイン（dB）。audio.targetLufs 指定時に呼び出し側が実測して渡す。
+   * 未指定なら audio.volume がそのまま使われる。
+   */
+  bgmGainDb?: number;
   /** x264 プリセット。下書きは veryfast、納品は medium/slow */
   preset?: string;
   crf?: number;
+}
+
+/** 実測は音源ごとに1回で足りるので使い回す */
+const loudnessCache = new Map<string, number | null>();
+
+/**
+ * 音源の統合ラウドネス（LUFS）を測る。
+ *
+ * loudnorm を1パスで掛けると音量が動的に動いて音楽が波打つので、
+ * 「測ってから静的なゲインを掛ける」2段構えにしている。
+ * こうすると出力が決定論的になり、同じ入力から同じ音が出る性質も保てる。
+ */
+export async function measureIntegratedLoudness(file: string): Promise<number | null> {
+  const cached = loudnessCache.get(file);
+  if (cached !== undefined) return cached;
+
+  let result: number | null = null;
+  try {
+    const { stderr } = await run(
+      FFMPEG_BIN,
+      ['-hide_banner', '-nostats', '-t', '120', '-i', file,
+       '-af', 'loudnorm=print_format=json', '-f', 'null', '-'],
+      { maxBuffer: 16 * 1024 * 1024 },
+    );
+    const match = /"input_i"\s*:\s*"?(-?\d+(?:\.\d+)?)"?/.exec(stderr);
+    if (match) result = Number(match[1]);
+  } catch {
+    result = null;
+  }
+
+  loudnessCache.set(file, result);
+  return result;
+}
+
+/** 目標 LUFS に合わせるゲイン。極端な値は事故になるので範囲を切る */
+export async function resolveBgmGainDb(file: string, targetLufs: number): Promise<number | undefined> {
+  const measured = await measureIntegratedLoudness(file);
+  if (measured === null || !Number.isFinite(measured)) {
+    console.warn(`[audio] ラウドネスを測定できなかったので volume の指定をそのまま使います: ${file}`);
+    return undefined;
+  }
+  return Math.max(-30, Math.min(15, targetLufs - measured));
 }
 
 export function buildFfmpegArgs(input: BuildArgsInput): string[] {
@@ -217,11 +284,11 @@ export function buildFfmpegArgs(input: BuildArgsInput): string[] {
 
   // --- 音声 ---
   const audio = template.audio;
-  const audioParts = [
-    `atrim=0:${n(total)}`,
-    'asetpts=PTS-STARTPTS',
-    `volume=${n(bgmFile ? audio.volume : 0)}`,
-  ];
+  const gainFilter =
+    bgmFile && input.bgmGainDb !== undefined
+      ? `volume=${n(input.bgmGainDb)}dB`
+      : `volume=${n(bgmFile ? audio.volume : 0)}`;
+  const audioParts = [`atrim=0:${n(total)}`, 'asetpts=PTS-STARTPTS', gainFilter];
   if (bgmFile) {
     if (audio.fadeIn > 0) audioParts.push(`afade=t=in:st=0:d=${n(audio.fadeIn)}`);
     if (audio.fadeOut > 0 && total - audio.fadeOut > 0) {

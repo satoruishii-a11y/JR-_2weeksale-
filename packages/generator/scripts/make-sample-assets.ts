@@ -9,7 +9,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createCanvas, GlobalFonts } from '@napi-rs/canvas';
-import { FFMPEG_BIN, runFfmpeg } from '../src/ffmpeg.js';
+import { FFMPEG_BIN } from '../src/ffmpeg.js';
+import { writeBgmMp3 } from './make-bgm.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ASSET_DIR = path.resolve(HERE, '../projects/sample-2weeksale/assets');
@@ -148,21 +149,9 @@ async function makeLogo(family: string): Promise<void> {
   await writeFile(path.join(ASSET_DIR, 'logo.png'), canvas.toBuffer('image/png'));
 }
 
-/** 権利フリーの仮BGM。ゆるいコードのパッドを合成する */
+/** デモ用の仮BGM。本番はライセンス音源に差し替える（audio.targetLufs で音量が揃う） */
 async function makeBgm(): Promise<void> {
-  const out = path.join(ASSET_DIR, 'bgm.mp3');
-  await runFfmpeg([
-    '-y', '-hide_banner', '-loglevel', 'error',
-    '-f', 'lavfi', '-i', 'sine=frequency=220:duration=24',
-    '-f', 'lavfi', '-i', 'sine=frequency=277.18:duration=24',
-    '-f', 'lavfi', '-i', 'sine=frequency=329.63:duration=24',
-    '-f', 'lavfi', '-i', 'sine=frequency=440:duration=24',
-    '-filter_complex',
-    '[0][1][2][3]amix=inputs=4:duration=longest,lowpass=f=1200,tremolo=f=0.45:d=0.35,volume=0.6,afade=t=in:st=0:d=1.5,afade=t=out:st=22:d=2[a]',
-    '-map', '[a]',
-    '-c:a', 'libmp3lame', '-b:a', '96k', '-ac', '2', '-ar', '48000',
-    out,
-  ]);
+  await writeBgmMp3(path.join(ASSET_DIR, 'bgm.mp3'));
 }
 
 async function main(): Promise<void> {

@@ -3,7 +3,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { registerFonts, type FontRegistry } from './draw.js';
-import { buildFfmpegArgs, extractContactSheet, extractThumbnail, runFfmpeg } from './ffmpeg.js';
+import { buildFfmpegArgs, extractContactSheet, extractThumbnail, resolveBgmGainDb, runFfmpeg } from './ffmpeg.js';
 import { buildManifest, manifestsToCsv, type Manifest } from './manifest.js';
 import { resolveNode } from './resolve.js';
 import { buildLayers, computeTimeline } from './timeline.js';
@@ -180,6 +180,10 @@ async function renderOne(
   const sheetFile = path.join(videoDir, `${job.id}-sheet.jpg`);
 
   const bgmFile = resolveBgm(template, project, projectDir);
+  const bgmGainDb =
+    bgmFile && template.audio.targetLufs !== undefined
+      ? await resolveBgmGainDb(bgmFile, template.audio.targetLufs)
+      : undefined;
   const args = buildFfmpegArgs({
     template,
     target,
@@ -187,6 +191,7 @@ async function renderOne(
     sceneFiles,
     layers,
     bgmFile,
+    bgmGainDb,
     outFile: videoFile,
     preset: options.preset,
     crf: options.crf,

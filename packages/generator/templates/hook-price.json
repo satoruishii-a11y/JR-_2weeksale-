@@ -27,7 +27,7 @@
     "benefit1", "benefit2", "offer", "cta"
   ],
 
-  "audio": { "volume": 0.18, "fadeIn": 0.5, "fadeOut": 1.2 },
+  "audio": { "targetLufs": -16, "volume": 0.18, "fadeIn": 0.5, "fadeOut": 1.2 },
 
   "defs": {
     "styles": {

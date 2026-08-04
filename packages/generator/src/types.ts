@@ -246,6 +246,11 @@ export const SceneSchema = z.object({
   motion: MotionSchema.default('still'),
   /** 0=控えめ 1=強め。ズーム量・パン量に掛かる */
   motionIntensity: z.number().min(0).max(1).default(0.5),
+  /**
+   * 動きの加減速。zoompan は既定だと等速で、機械的に見える。
+   * 実際の広告は寄り始めが速く終わりで減速するので ease-out を既定にした。
+   */
+  motionEase: z.enum(['linear', 'ease-out', 'ease-in-out']).default('ease-out'),
   /** 直前のシーンからの繋ぎ。scenes[0] では無視される */
   transitionIn: TransitionSchema.default('cut'),
   transitionDuration: z.number().min(0).default(0.35),
@@ -272,6 +277,12 @@ export const ResolvedTemplateSchema = z.object({
   audio: z
     .object({
       bgm: z.string().optional(),
+      /**
+       * BGM の目標ラウドネス（LUFS）。指定すると音源を実測して静的ゲインを掛けるので、
+       * どの音源に差し替えても仕上がりの音量が揃う。volume は無視される。
+       * YouTube は概ね -14 LUFS に正規化するため、音楽のみの広告は -16 前後が無難。
+       */
+      targetLufs: z.number().min(-40).max(-6).optional(),
       volume: z.number().min(0).max(2).default(0.22),
       fadeIn: z.number().min(0).default(0.6),
       fadeOut: z.number().min(0).default(1.0),
