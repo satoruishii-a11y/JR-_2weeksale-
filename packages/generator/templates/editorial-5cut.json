@@ -349,7 +349,7 @@
       "transitionDuration": { "$ref": "defs.beat.half" },
       "grade": { "$ref": "defs.grade" },
       "overlays": [
-        { "$ref": "defs.scrimBottom", "heightPct": 42, "strength": 0.44 },
+        { "$ref": "defs.scrimBottom", "heightPct": 46, "strength": 0.72 },
         {
           "$ref": "defs.rule.horizontal",
           "anchor": "bottom-left",
@@ -385,7 +385,7 @@
       "transitionDuration": { "$ref": "defs.beat.half" },
       "grade": { "brightness": 0.03, "contrast": 1.04, "saturation": 0.86, "blurPx": 0 },
       "overlays": [
-        { "$ref": "defs.scrimBottom", "side": "full", "heightPct": 100, "strength": 0.34 },
+        { "$ref": "defs.scrimBottom", "side": "full", "heightPct": 100, "strength": 0.22 },
         {
           "kind": "image",
           "role": "logo",
