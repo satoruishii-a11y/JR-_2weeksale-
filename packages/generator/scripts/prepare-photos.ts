@@ -20,11 +20,16 @@
  *   }
  */
 
+import { execFile } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
+import { promisify } from 'node:util';
 
-import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { loadImage } from '@napi-rs/canvas';
+import ffmpegPath from 'ffmpeg-static';
+
+const run = promisify(execFile);
 
 /** イラスト版と同じ出力サイズ。ここを変えると全カットの解像度が変わる */
 const TARGETS = [
@@ -136,6 +141,47 @@ function coverRect(
   return { sx, sy, sw, sh };
 }
 
+/**
+ * ffmpeg で切り出して拡縮する。canvas の drawImage よりも lanczos のほうが
+ * 拡大時のディテールが残る。さらに拡大方向のときは軽く unsharp をかける。
+ * 拡大率に応じて強度を上げるが、輪郭が立ちすぎると安っぽくなるので上限を置く。
+ */
+async function cropResize(
+  src: string,
+  dest: string,
+  rect: { sx: number; sy: number; sw: number; sh: number },
+  target: { width: number; height: number },
+  quality: number,
+): Promise<void> {
+  if (!ffmpegPath) throw new Error('ffmpeg-static が見つかりません');
+
+  const upscale = target.width / rect.sw;
+  const filters = [
+    `crop=${Math.round(rect.sw)}:${Math.round(rect.sh)}:${Math.round(rect.sx)}:${Math.round(rect.sy)}`,
+    `scale=${target.width}:${target.height}:flags=lanczos`,
+  ];
+  if (upscale > 1.2) {
+    const amount = Math.min(0.9, 0.35 * upscale);
+    filters.push(`unsharp=luma_msize_x=5:luma_msize_y=5:luma_amount=${amount.toFixed(2)}`);
+  }
+
+  // JPEG の品質は 2（最高）〜31（最低）。--quality の 0-100 から写す
+  const qscale = Math.max(2, Math.min(31, Math.round(31 - (quality / 100) * 29)));
+
+  await run(ffmpegPath, [
+    '-y',
+    '-loglevel',
+    'error',
+    '-i',
+    src,
+    '-vf',
+    filters.join(','),
+    '-q:v',
+    String(qscale),
+    dest,
+  ]);
+}
+
 async function main(): Promise<void> {
   const { project, quality } = parseArgs(process.argv.slice(2));
   const projectDir = path.resolve(project);
@@ -199,12 +245,8 @@ async function main(): Promise<void> {
         );
       }
 
-      const canvas = createCanvas(target.width, target.height);
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(image, sx, sy, sw, sh, 0, 0, target.width, target.height);
-
       const file = path.join(outDir, `${slot}.jpg`);
-      await writeFile(file, await canvas.encode('jpeg', quality));
+      await cropResize(path.join(photosDir, spec.src), file, { sx, sy, sw, sh }, target, quality);
       console.log(`  ${target.ratio}  ${slot}.jpg  ← ${spec.src}`);
     }
   }
