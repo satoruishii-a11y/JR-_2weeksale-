@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "kyoto-assets": "tsx scripts/make-kyoto-assets.ts",
-    "demo-kyoto": "npm run kyoto-assets && tsx src/cli.ts render --project projects/kyoto-koyo --template editorial-15s --strategy orthogonal:5 --ratios 16x9,9x16 --contact-sheet"
+    "demo-kyoto": "npm run kyoto-assets && tsx src/cli.ts render --project projects/kyoto-koyo --template editorial-15s --strategy orthogonal:5 --ratios 16x9,9x16 --contact-sheet",
+    "prepare-photos": "tsx scripts/prepare-photos.ts --project projects/kyoto-koyo"
   },
   "dependencies": {
     "@expo-google-fonts/noto-sans-jp": "^0.4.3",
